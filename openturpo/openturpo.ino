@@ -1,4 +1,33 @@
 
+/* The following are command definitions for the
+ * serial protocol used to control engine parameters
+ * and monitor sensors in real-time.
+ */
+enum{
+  SET  = 'a',
+  READ = 'b'
+}COMMAND;
+
+enum{
+  ALL =             'a',
+  LAMBDA =          'b',
+  FUEL_PUMP_RELAY = 'c',
+  AMM =             'd',
+  AMM_TEMP =        'e',
+  ENGINE_TEMP =     'f',
+  INJECTOR_RELAY =  'g',
+  DME_RELAY =       'h',
+  RPM =             'i',
+  FUEL_CONSUMPTION = 'j',
+  FAN_LO =          'k',
+  FAN_HI =          'l'
+}DEVICE;
+
+enum{
+  ON =   'a',
+  OFF =  'b'
+}OPERATION;
+
 /* This value is for E85.
  * For unleaded gasoline, use 14.7
  */
@@ -17,7 +46,7 @@ float fuel_density[32][32] = {
     0.79788,0.79704,0.79620,0.79283,0.79198,0.79114,0.79029,
     0.78945,0.78860,0.78775,0.78691,0.78606,0.78522,0.78182,
     0.78097,0.78012,0.77927,0.77841,0.77756,0.77671,0.77585,
-    0.77500,0.77414,0.77329,0.77244  }
+    0.77500,0.77414,0.77329,0.77244}
 };
 
 /* This value represents the injector flow rates.
@@ -74,6 +103,9 @@ void setup(){
   pinMode(fan_hi, OUTPUT);
   
   analogWrite(iac, 255);
+  
+  /* Set up serial communication. */
+  Serial.begin(9600);
 }
 
 void loop(){
@@ -87,6 +119,7 @@ void loop(){
   byte duty_cycle = 255*(air/(afr*cylinders))/inj_hrs_mass;
   analogWrite(injector_bank_one, duty_cycle);
   analogWrite(injector_bank_two, duty_cycle);
+  
 }
 
 void ignition(){
@@ -107,4 +140,103 @@ void crank_trigger(){
   static float RPM = 60000000/time_diff;
 }
 
+void serialEvent(){
+  /* This function handles communication with the outside world
+   * via the serial communication interface.
+   */
+   byte command = Serial.read();
+   Serial.println("Command received");
+   Serial.flush();
+   switch(command){
+    case SET:
+      processSet();
+      break;
+    case READ:
+      processRead();
+      break;
+   }
+}
+
+void processSet(){
+   byte device = Serial.read();
+   Serial.flush();
+   byte operation = Serial.read();
+   Serial.flush();
+   
+   switch(device){
+    case ALL:
+      if(operation == ON){
+        digitalWrite(fuel_pump, HIGH);
+        digitalWrite(inj_relay, HIGH);
+        digitalWrite(dme_relay, HIGH);
+        Serial.println("All relays online.");
+      }
+      else{
+        digitalWrite(fuel_pump, LOW);
+        digitalWrite(inj_relay, LOW);
+        digitalWrite(dme_relay, LOW);
+        Serial.println("All relays offline.");
+      }
+      break;
+     
+    case FUEL_PUMP_RELAY:
+      if(operation == ON){
+        digitalWrite(fuel_pump, HIGH);
+        Serial.println("Fuel pump online.");
+      }
+      else{
+        digitalWrite(fuel_pump, LOW);
+        Serial.println("Fuel pump offline."); 
+      }
+      break;
+    case INJECTOR_RELAY:
+     if(operation == ON){
+       digitalWrite(inj_relay, HIGH);
+       Serial.println("Injectors online."); 
+     }
+     else{
+       digitalWrite(inj_relay, LOW);
+       Serial.println("Injectors offline."); 
+     }
+     break;
+    case DME_RELAY:
+     if(operation == ON){
+       digitalWrite(dme_relay, HIGH);
+       Serial.println("DME relay online."); 
+     }
+     else{
+       digitalWrite(dme_relay, LOW);
+       Serial.println("DME relay offline.");
+     }
+     break;
+     case FAN_LO:
+      if(operation == ON){
+        digitalWrite(fan_hi, LOW);
+        digitalWrite(fan_lo, HIGH);
+        Serial.println("Engine fan set to low speed.");
+      }
+      else{
+        digitalWrite(fan_lo, LOW);
+        digitalWrite(fan_hi, LOW);
+        Serial.println("Engine fan offline.");
+      }
+     break;
+     case FAN_HI:
+      if(operation == ON){
+        digitalWrite(fan_lo, LOW);
+        digitalWrite(fan_hi, HIGH);
+        Serial.println("Engine fan set to high speed.");
+      }
+      else{
+        digitalWrite(fan_lo, LOW);
+        digitalWrite(fan_hi, LOW);
+        Serial.println("Engine fan offline.");
+      }
+     break;
+  }
+}
+
+void processRead(){
+  
+}
 
