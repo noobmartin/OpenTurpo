@@ -256,26 +256,40 @@ void processRead(){
       Serial.write(analogRead(lambda));
     break;
     case AMM:
-   
+      Serial.write(amm_conversion(analogRead(amm)));
     break;
     case AMM_TEMP:
-   
+      Serial.write(amm_temp_conversion(analogRead(amm_temp)));
     break;
     case ENGINE_TEMP:
-   
+      Serial.write(engine_temp_conversion(analogRead(engine_temp)));
     break;
     case RPM:
       Serial.write(RPM);
     break;
     case ALL:
       sensor_data.lambda = analogRead(lambda);
-      sensor_data.amm = 0;
-      sensor_data.amm_temp = 0;
+      sensor_data.amm = amm_conversion(analogRead(amm));
+      sensor_data.amm_temp = amm_temp_conversion(analogRead(amm_temp));
       sensor_data.rpm = RPM;
-      sensor_data.engine_temp = 0;
+      sensor_data.engine_temp = engine_temp_conversion(analogRead(engine_temp));
       sensor_data.fuel_consumption = 0;
       Serial.write((uint8_t*)&sensor_data, sizeof(full_sensor_data));
     break; 
    }
 }
 
+float engine_temp_conversion(int engine_temp){
+ /* Simple table lookup. */
+ return 0; 
+}
+
+float amm_conversion(int amm){
+  /* Simple table lookup. */
+  return 0;
+}
+
+float amm_temp_conversion(int amm_temp){
+  /* Simple table lookup. */
+  return 0;
+}
