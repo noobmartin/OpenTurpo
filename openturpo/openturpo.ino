@@ -28,6 +28,15 @@ enum{
   OFF =  'b'
 }OPERATION;
 
+typedef struct{
+  int lambda;
+  float amm;
+  float amm_temp;
+  float rpm;
+  float engine_temp;
+  float fuel_consumption;
+}full_sensor_data;
+
 /* This value is for E85.
  * For unleaded gasoline, use 14.7
  */
@@ -237,6 +246,36 @@ void processSet(){
 }
 
 void processRead(){
-  
+   byte device = Serial.read();
+   Serial.flush();
+   
+   full_sensor_data sensor_data;
+   
+   switch (device){
+    case LAMBDA:
+      Serial.write(analogRead(lambda));
+    break;
+    case AMM:
+   
+    break;
+    case AMM_TEMP:
+   
+    break;
+    case ENGINE_TEMP:
+   
+    break;
+    case RPM:
+      Serial.write(RPM);
+    break;
+    case ALL:
+      sensor_data.lambda = analogRead(lambda);
+      sensor_data.amm = 0;
+      sensor_data.amm_temp = 0;
+      sensor_data.rpm = RPM;
+      sensor_data.engine_temp = 0;
+      sensor_data.fuel_consumption = 0;
+      Serial.write((uint8_t*)&sensor_data, sizeof(full_sensor_data));
+    break; 
+   }
 }
 
