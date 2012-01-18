@@ -20,7 +20,9 @@ enum{
   RPM =             'i',
   FUEL_CONSUMPTION = 'j',
   FAN_LO =          'k',
-  FAN_HI =          'l'
+  FAN_HI =          'l',
+  FAN =             'm',
+  IAC =             'n'
 }DEVICE;
 
 enum{
@@ -28,8 +30,19 @@ enum{
   OFF =  'b'
 }OPERATION;
 
+enum{
+  DISABLED,
+  LO,
+  HI
+}FAN_MODE;
+
 typedef struct{
-  int lambda;
+  byte iac;
+  byte fan;
+  byte dme_relay;
+  byte fuel_pump;
+  byte inj_relay;
+  float lambda;
   float amm;
   float amm_temp;
   float rpm;
@@ -46,16 +59,15 @@ static float afr = 9.76;
  * ethanol at various temperatures in centigrade and g/cc.
  */
 float fuel_dens_avg = 0.802;
-float fuel_density[32][32] = {
-  {
-    3,4,5,6,7,8,9,10,11,12,16,17,18,19,20,21,22,23,24,25,29,30,31,32,33,34,35,36,37,38,39,40  }
-  ,
-  {
+float fuel_density_temperatures[32] =   
+{3,4,5,6,7,8,9,10,11,12,16,17,18,19,20,21,22,23,24,25,29,30,31,32,33,34,35,36,37,38,39,40};
+float fuel_density[32] =
+{
     0.8037,0.80290,0.80207,0.80123,0.80039,0.79956,0.79872,
     0.79788,0.79704,0.79620,0.79283,0.79198,0.79114,0.79029,
     0.78945,0.78860,0.78775,0.78691,0.78606,0.78522,0.78182,
     0.78097,0.78012,0.77927,0.77841,0.77756,0.77671,0.77585,
-    0.77500,0.77414,0.77329,0.77244}
+    0.77500,0.77414,0.77329,0.77244
 };
 
 /* This value represents the injector flow rates.
@@ -242,6 +254,10 @@ void processSet(){
         Serial.println("Engine fan offline.");
       }
      break;
+     case IAC:
+       analogWrite(iac, operation);
+       Serial.println("IAC value set.");
+     break;
   }
 }
 
@@ -252,6 +268,30 @@ void processRead(){
    full_sensor_data sensor_data;
    
    switch (device){
+    case IAC:
+      /* Do not know if this is correct since iac is set to OUTPUT mode. */
+      Serial.write(analogRead(iac));
+    break;
+    case FAN:
+      if(bitRead(PORTD, fan_lo)){
+        Serial.write(LO);
+      }
+      else if(bitRead(PORTD, fan_hi)){
+        Serial.write(HI);
+      }
+      else{
+        Serial.write(DISABLED);
+      }
+    break;
+    case DME_RELAY:
+      Serial.write(bitRead(PORTD, dme_relay));
+    break;
+    case INJECTOR_RELAY:
+      Serial.write(bitRead(PORTD, inj_relay));
+    break;
+    case FUEL_PUMP_RELAY:
+      Serial.write(bitRead(PORTD, fuel_pump));
+    break;
     case LAMBDA:
       Serial.write(analogRead(lambda));
     break;
@@ -268,6 +308,20 @@ void processRead(){
       Serial.write(RPM);
     break;
     case ALL:
+      if(bitRead(PORTD, fan_lo)){
+        sensor_data.fan = LO;
+      }
+      else if(bitRead(PORTD, fan_hi)){
+        sensor_data.fan = HI;
+      }
+      else{
+        sensor_data.fan = DISABLED;
+      }
+      /* Do not know if the following line is correct or not. */
+      sensor_data.iac = analogRead(iac);
+      sensor_data.dme_relay = bitRead(PORTD, dme_relay);
+      sensor_data.fuel_pump = bitRead(PORTD, fuel_pump);
+      sensor_data.inj_relay = bitRead(PORTD, inj_relay);
       sensor_data.lambda = analogRead(lambda);
       sensor_data.amm = amm_conversion(analogRead(amm));
       sensor_data.amm_temp = amm_temp_conversion(analogRead(amm_temp));
