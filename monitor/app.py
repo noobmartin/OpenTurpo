@@ -26,6 +26,8 @@ class App(object):
         builder.connect_signals({
                 "on_window_destroy" : self.quit,
                 "btn_fuel_pump_pressed": self.btn_fuel_pump_pressed,
+                "btn_injector_pressed": self.btn_injector_pressed,
+                "btn_dme_pressed": self.btn_dme_pressed,
         })
         self.window = builder.get_object("window1")
         self.window.show()
@@ -51,9 +53,16 @@ class App(object):
         self.btn_dme             = builder.get_object('btn_dme')
 
         self.poll = pollcls(self, **kwargs)
+        self.poll.start()
     
     def btn_fuel_pump_pressed(self, widget):
         self.poll.set_fuel_pump(not widget.get_active())
+
+    def btn_injector_pressed(self, widget):
+        self.poll.set_injector(not widget.get_active())
+
+    def btn_dme_pressed(self, widget):
+        self.poll.set_dme(not widget.get_active())
 
     def set_iac(self, value):
         self.lb_iac.set_markup('%d' % value)

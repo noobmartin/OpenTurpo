@@ -15,7 +15,6 @@ class Poller(threading.Thread):
         self.app = app
         self.delay = float(pollrate) / 1000
         self._run = True
-        self.start()
 
     def stop(self):
         self._run = False
@@ -23,6 +22,20 @@ class Poller(threading.Thread):
     def set_fuel_pump(self, value):
         with self.lock:
             self.write('ac' + (value and 'a' or 'b'))
+            line = self.readline()
+            if line:
+                print('io:', line, file=sys.stderr)
+
+    def set_injector(self, value):
+        with self.lock:
+            self.write('ag' + (value and 'a' or 'b'))
+            line = self.readline()
+            if line:
+                print('io:', line, file=sys.stderr)
+
+    def set_dme(self, value):
+        with self.lock:
+            self.write('ah' + (value and 'a' or 'b'))
             line = self.readline()
             if line:
                 print('io:', line, file=sys.stderr)

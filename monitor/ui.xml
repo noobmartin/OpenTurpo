@@ -383,6 +383,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
+                <signal name="pressed" handler="btn_injector_pressed" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -399,6 +400,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
+                <signal name="pressed" handler="btn_dme_pressed" swapped="no"/>
               </object>
               <packing>
                 <property name="left_attach">2</property>
