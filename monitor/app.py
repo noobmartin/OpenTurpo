@@ -6,7 +6,7 @@ import argparse
 import serial
 import threading
 import time
-import sys
+import sys, os
 from struct import Struct
 
 class Poller(threading.Thread):
@@ -75,7 +75,7 @@ class App(object):
 
     def __init__(self, **kwargs):
         builder = Gtk.Builder()
-        builder.add_from_file("ui.xml")
+        builder.add_from_file(os.path.join(os.path.dirname(sys.modules[__name__].__file__), "ui.xml"))
         builder.connect_signals({ "on_window_destroy" : self.quit })
         self.window = builder.get_object("window1")
         self.window.show()
