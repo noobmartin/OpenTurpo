@@ -10,11 +10,11 @@ import sys
 from struct import Struct
 
 class Poller(threading.Thread):
-    def __init__(self, app, device, baudrate, delay):
+    def __init__(self, app, device, baudrate, pollrate):
         threading.Thread.__init__(self)
         #self.ser = serial.Serial(port=device, baudrate=baudrate, timeout=1)
         self.app = app
-        self.delay = float(delay) / 1000
+        self.delay = float(pollrate) / 1000
         self.struct = Struct('cccccffffff')
         
         self._run = True
