@@ -3,6 +3,7 @@
 
 import threading
 import time
+import sys
 from struct import Struct
 from gi.repository import GObject
 
