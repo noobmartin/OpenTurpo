@@ -1,3 +1,7 @@
 # emacs
 *~
 \#*\#
+.\#*
+
+# python
+*.py[co]
