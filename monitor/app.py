@@ -97,7 +97,6 @@ class App(object):
         self.lb_rpm              = builder.get_object('lb_rpm')
         self.lb_fuel_consumption = builder.get_object('lb_fuel_consumption')
 
-        print 'poller'
         self.poll = Poller(self, **kwargs)
     
     def set_iac(self, value):
