@@ -53,7 +53,7 @@ class Poller(threading.Thread):
     def run(self):
         global status
         t = time.time()
-        last = 0
+        last = t
         while self._run:
             with self.lock:
                 self.write('ba')
