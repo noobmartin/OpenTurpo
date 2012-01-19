@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAction" id="action1">
+    <property name="stock_id">gtk-color-picker</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">255</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkWindow" id="window1">
     <property name="can_focus">False</property>
     <child>
@@ -105,7 +113,7 @@
               <object class="GtkLabel" id="lb_fan">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">9000</property>
+                <property name="label" translatable="yes">OFF/LOW/HIGH</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 14"/>
                 </attributes>
@@ -121,7 +129,7 @@
               <object class="GtkLabel" id="lb_dme">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">OFF</property>
+                <property name="label" translatable="yes">ON/OFF</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 14"/>
                 </attributes>
@@ -137,7 +145,7 @@
               <object class="GtkLabel" id="lb_injector">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">3.1415</property>
+                <property name="label" translatable="yes">ON/OFF</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 14"/>
                 </attributes>
@@ -153,7 +161,7 @@
               <object class="GtkLabel" id="lb_fuel_pump">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">63236</property>
+                <property name="label" translatable="yes">ON/OFF</property>
                 <attributes>
                   <attribute name="font-desc" value="Sans Bold 14"/>
                 </attributes>
@@ -362,13 +370,14 @@
           </packing>
         </child>
         <child>
-          <object class="GtkBox" id="box3">
+          <object class="GtkGrid" id="grid2">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="homogeneous">True</property>
+            <property name="row_homogeneous">True</property>
+            <property name="column_homogeneous">True</property>
             <child>
-              <object class="GtkButton" id="button1">
-                <property name="label" translatable="yes">foo</property>
+              <object class="GtkToggleButton" id="btn_injector">
+                <property name="label" translatable="yes">Injector</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -376,14 +385,15 @@
                 <property name="use_action_appearance">False</property>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button2">
-                <property name="label" translatable="yes">bar</property>
+              <object class="GtkToggleButton" id="btn_dme">
+                <property name="label" translatable="yes">DME</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -391,31 +401,34 @@
                 <property name="use_action_appearance">False</property>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="left_attach">2</property>
+                <property name="top_attach">0</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button3">
-                <property name="label" translatable="yes">baz</property>
+              <object class="GtkToggleButton" id="btn_fuel_pump">
+                <property name="label" translatable="yes">Fuel pump</property>
                 <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_action_appearance">False</property>
+                <signal name="pressed" handler="btn_fuel_pump_pressed" swapped="no"/>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
               </packing>
             </child>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">2</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>

@@ -9,36 +9,54 @@ import time
 import sys, os
 from struct import Struct
 
+status = Struct('cccccffffff')
+
+# for testing
+rnd = list(open('/dev/urandom', 'rb').read(status.size))
+rnd[1] //= 86
+rnd[2] //= 129
+rnd[3] //= 129
+rnd[4] //= 129
+
 class Poller(threading.Thread):
-    def __init__(self, app, device, baudrate, pollrate):
+    def __init__(self, app, pollrate, **kwargs):
         threading.Thread.__init__(self)
-        #self.ser = serial.Serial(port=device, baudrate=baudrate, timeout=1)
+        self.lock = threading.Lock()
         self.app = app
         self.delay = float(pollrate) / 1000
-        self.struct = Struct('cccccffffff')
-        
         self._run = True
         self.start()
 
     def stop(self):
         self._run = False
 
-    def run(self):
-        rnd = list(open('/dev/urandom').read(self.struct.size))
-        rnd[1] = chr(ord(rnd[1]) / 86)
-        rnd[2] = chr(ord(rnd[2]) / 129)
-        rnd[3] = chr(ord(rnd[3]) / 129)
-        rnd[4] = chr(ord(rnd[4]) / 129)
+    def set_fuel_pump(self, value):
+        with self.lock:
+            self.write('ac' + (value and 'a' or 'b'))
+            line = self.readline()
+            if line:
+                print('io:', line, file=sys.stderr)
+            
+    def read(self, size):
+        raise NotImplementedError
 
+    def readline(self):
+        raise NotImplementedError
+
+    def write(self, data):
+        raise NotImplementedError
+
+    def run(self):
+        global status
         t = time.time()
         last = 0
         while self._run:
-            #self.ser.write('ba')
-            #data = self.ser.read(self.struct.size)
-            row = self.struct.unpack(''.join(rnd))
-            time.sleep(0.05)
+            with self.lock:
+                self.write('ba')
+                data = self.read(status.size)
+                row = status.unpack(data)
+                time.sleep(0.05)
 
-            print row
             GObject.idle_add(self.app.set_iac, ord(row[0]))
             GObject.idle_add(self.app.set_fan, ord(row[1]))
             GObject.idle_add(self.app.set_dme, ord(row[2]))
@@ -58,10 +76,38 @@ class Poller(threading.Thread):
             read = now-last
             last = now
             if delta < 0:
-                print >> sys.stderr, 'Not reading fast enough, try lowering poll-rate (current: %dms, read operation took %dms)' % (int(self.delay*1000), int(read*1000))
+                print('Not reading fast enough, try lowering poll-rate (current: %dms, read operation took %dms)' % (int(self.delay*1000), int(read*1000)), file=sys.stderr)
                 continue
             time.sleep(delta)
-            
+
+class MockPoller(Poller):
+    def __init__(self, *args, **kwargs):
+        Poller.__init__(self, *args, **kwargs)
+          
+    def read(self, size):
+        global rnd
+        return bytes(rnd)
+
+    def readline(self):
+        return None
+
+    def write(self, data):
+        pass
+
+class SerialPoller(Poller):
+    def __init__(self, app, device, baudrate, **kwargs):
+        Poller.__init__(self, app, **kwargs)
+        self.ser = serial.Serial(port=device, baudrate=baudrate, timeout=1)
+          
+    def read(self, size):
+        return self.ser.read(size)
+
+    def readline(self):
+        return self.ser.readline()
+
+    def write(self, data):
+        self.ser.write(data)
+  
 class App(object):
     fan_mode = {
         0: 'Disabled',
@@ -73,10 +119,13 @@ class App(object):
         1: 'ON',
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, pollcls, **kwargs):
         builder = Gtk.Builder()
         builder.add_from_file(os.path.join(os.path.dirname(sys.modules[__name__].__file__), "ui.xml"))
-        builder.connect_signals({ "on_window_destroy" : self.quit })
+        builder.connect_signals({
+                "on_window_destroy" : self.quit,
+                "btn_fuel_pump_pressed": self.btn_fuel_pump_pressed,
+        })
         self.window = builder.get_object("window1")
         self.window.show()
 
@@ -96,9 +145,15 @@ class App(object):
         self.lb_engine_temp      = builder.get_object('lb_engine_temp')
         self.lb_rpm              = builder.get_object('lb_rpm')
         self.lb_fuel_consumption = builder.get_object('lb_fuel_consumption')
+        self.btn_fuel_pump       = builder.get_object('btn_fuel_pump')
+        self.btn_injector        = builder.get_object('btn_injector')
+        self.btn_dme             = builder.get_object('btn_dme')
 
-        self.poll = Poller(self, **kwargs)
+        self.poll = pollcls(self, **kwargs)
     
+    def btn_fuel_pump_pressed(self, widget):
+        self.poll.set_fuel_pump(not widget.get_active())
+
     def set_iac(self, value):
         self.lb_iac.set_markup('%d' % value)
 
@@ -106,12 +161,15 @@ class App(object):
         self.lb_fan.set_markup(App.fan_mode[value])
 
     def set_dme(self, value):
+        self.btn_dme.set_active(value == 1)
         self.lb_dme.set_markup(App.relay_mode[value])
 
     def set_injector(self, value):
+        self.btn_injector.set_active(value == 1)
         self.lb_injector.set_markup(App.relay_mode[value])
 
     def set_fuel_pump(self, value):
+        self.btn_fuel_pump.set_active(value == 1)
         self.lb_fuel_pump.set_markup(App.relay_mode[value])
 
     def set_lambda(self, value):
@@ -141,6 +199,7 @@ parser = argparse.ArgumentParser(description='Herp a derp.')
 parser.add_argument('-d', '--device', default='/dev/ttyS1')
 parser.add_argument('-r', '--baudrate', default=9600, type=int)
 parser.add_argument('-t', '--pollrate', default=1000/25, type=int, help="Poll rate in ms")
+parser.add_argument('--mockup', dest='pollcls', action="store_const", default=SerialPoller, const=MockPoller, help="Disable serial communication and use mockup communication.")
 
 args = vars(parser.parse_args())
 
