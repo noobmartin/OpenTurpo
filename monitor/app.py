@@ -17,7 +17,7 @@ class App(object):
     }
     relay_mode = {
         0: '<span color="#ff0000">OFF</span>',
-        1: 'ON',
+        1: '<span color="#009900">ON</span>',
     }
 
     def __init__(self, pollcls, **kwargs):
