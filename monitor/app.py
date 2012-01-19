@@ -111,9 +111,8 @@ parser.add_argument('-r', '--baudrate', default=9600, type=int)
 parser.add_argument('-t', '--pollrate', default=1000/25, type=int, help="Poll rate in ms")
 parser.add_argument('--mockup', dest='pollcls', action="store_const", default=SerialPoller, const=MockPoller, help="Disable serial communication and use mockup communication.")
 
-args = vars(parser.parse_args())
-
-if __name__ == "__main__":
+def run():
+    args = vars(parser.parse_args())
     app = App(**args)
 
     GLib.threads_init()
@@ -121,3 +120,6 @@ if __name__ == "__main__":
     Gdk.threads_enter()
     Gtk.main()
     Gdk.threads_leave()
+
+if __name__ == "__main__":
+    run()
