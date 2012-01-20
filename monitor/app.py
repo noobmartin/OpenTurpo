@@ -31,6 +31,7 @@ class App(object):
                 "btn_dme_pressed": self.btn_dme_pressed,
                 "fan_output": self.fan_output,
                 "fan_changed": self.fan_changed,
+                "iac_changed": self.iac_changed,
         })
         self.window = builder.get_object("window1")
         self.window.show()
@@ -55,6 +56,7 @@ class App(object):
         self.btn_injector        = builder.get_object('btn_injector')
         self.btn_dme             = builder.get_object('btn_dme')
         self.adj_fan             = builder.get_object('adj_fan')
+        self.adj_iac             = builder.get_object('adj_iac')
 
         self.poll = pollcls(self, **kwargs)
 
@@ -71,6 +73,10 @@ class App(object):
     def fan_changed(self, widget):
         self.poll.set_fan(widget.get_value())
         return True
+
+    def iac_changed(self, widget):
+        self.poll.set_iac(widget.get_value())
+        return True
     
     def btn_fuel_pump_pressed(self, widget):
         self.poll.set_fuel_pump(not widget.get_active())
@@ -82,6 +88,7 @@ class App(object):
         self.poll.set_dme(not widget.get_active())
 
     def set_iac(self, value):
+        self.adj_iac.set_value(value)
         self.lb_iac.set_markup('%d' % value)
 
     def set_fan(self, value):

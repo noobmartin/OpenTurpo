@@ -85,6 +85,8 @@ class MockPoller(Poller):
                     self._fan = 2
                 else:
                     self._fan = 0
+            elif data[1] == 'n': # iac
+                self._iac = ord(data[2])
             else:
                 print("unknown set operation:", data, file=sys.stderr)
         else:

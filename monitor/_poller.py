@@ -21,6 +21,13 @@ class Poller(threading.Thread):
     def stop(self):
         self._run = False
 
+    def set_iac(self, value):
+        with self.lock:
+            self.write('an' + chr(int(value)))
+            line = self.readline()
+            if line:
+                print('io:', line, file=sys.stderr)
+
     def set_fan(self, value):
         if int(value) == 0:
             v = 'kb'
