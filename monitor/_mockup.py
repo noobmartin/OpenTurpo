@@ -1,19 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8; -*-
 
+from __future__ import print_function
 from _poller import Poller
 from struct import Struct
 import random
 import sys
 
 status = Struct('cccccffffff')
-
-# for testing
-rnd = list(open('/dev/urandom', 'rb').read(status.size))
-rnd[1] //= 86
-rnd[2] //= 129
-rnd[3] //= 129
-rnd[4] //= 129
 
 class MockPoller(Poller):
     def __init__(self, *args, **kwargs):
@@ -32,7 +26,7 @@ class MockPoller(Poller):
         self._fuel_consumption = random.random() * 10.0
 
         self._queue = []
-          
+    
     def read(self, size):
         return self._queue.pop()
 
