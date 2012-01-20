@@ -57,6 +57,11 @@ class App(object):
         self.adj_fan             = builder.get_object('adj_fan')
 
         self.poll = pollcls(self, **kwargs)
+
+        sb = builder.get_object('statusbar')
+        context_id = sb.get_context_id("progress_message")
+        sb.push(context_id, self.poll.description())
+
         self.poll.start()
 
     def fan_output(self, spinner):

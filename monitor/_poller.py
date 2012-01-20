@@ -56,7 +56,10 @@ class Poller(threading.Thread):
             line = self.readline()
             if line:
                 print('io:', line, file=sys.stderr)
-            
+    
+    def description(self):
+        raise NotImplementedError
+
     def read(self, size):
         raise NotImplementedError
 

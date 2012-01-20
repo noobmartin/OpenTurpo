@@ -52,6 +52,9 @@ class MockPoller(Poller):
             self._fuel_consumption,
             )
 
+    def description(self):
+        return "Mockup Mode"
+
     def read(self, size):
         return self._queue.pop()
 
