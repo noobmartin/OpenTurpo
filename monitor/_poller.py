@@ -60,7 +60,6 @@ class Poller(threading.Thread):
                 self.write('ba')
                 data = self.read(status.size)
                 row = status.unpack(data)
-                time.sleep(0.05)
 
             GObject.idle_add(self.app.set_iac, ord(row[0]))
             GObject.idle_add(self.app.set_fan, ord(row[1]))
