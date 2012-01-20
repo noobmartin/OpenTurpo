@@ -9,6 +9,15 @@ import sys
 
 status = Struct('cccccffffff')
 
+import platform
+major = platform.python_version_tuple()[0]
+if major == '3':
+    def encode(v):
+        return bytes([v])
+else:
+    def encode(v):
+        return chr(v)
+
 class MockPoller(Poller):
     def __init__(self, *args, **kwargs):
         Poller.__init__(self, *args, **kwargs)
@@ -27,6 +36,22 @@ class MockPoller(Poller):
 
         self._queue = []
     
+    def serialize(self):
+        global status
+        return status.pack(
+            encode(self._iac),
+            encode(self._fan),
+            encode(self._dme),
+            encode(self._fuel_pump),
+            encode(self._injector),
+            self._lambda,
+            self._amm,
+            self._amm_temp,
+            self._rpm,
+            self._engine_temp,
+            self._fuel_consumption,
+            )
+
     def read(self, size):
         return self._queue.pop()
 
@@ -39,19 +64,7 @@ class MockPoller(Poller):
         t = data[0]
         if t == 'b': # read operation
             assert data[1] == 'a'
-            self._queue.append(status.pack(
-                    bytes([self._iac]),
-                    bytes([self._fan]),
-                    bytes([self._dme]),
-                    bytes([self._fuel_pump]),
-                    bytes([self._injector]),
-                    self._lambda,
-                    self._amm,
-                    self._amm_temp,
-                    self._rpm,
-                    self._engine_temp,
-                    self._fuel_consumption,
-                    ))
+            self._queue.append(self.serialize())
         elif t == 'a': # set operation
             if data[1] == 'c': # fuel pump
                 self._fuel_pump = data[2] == 'a' and 1 or 0
