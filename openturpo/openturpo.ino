@@ -19,10 +19,8 @@ enum{
   DME_RELAY =       'h',
   RPM =             'i',
   FUEL_CONSUMPTION = 'j',
-  FAN_LO =          'k',
-  FAN_HI =          'l',
-  FAN =             'm',
-  IAC =             'n'
+  FAN =             'k',
+  IAC =             'l'
 }DEVICE;
 
 enum{
@@ -31,9 +29,9 @@ enum{
 }OPERATION;
 
 enum{
-  DISABLED,
-  LO,
-  HI
+  DISABLED =  'a',
+  LO =        'b',
+  HI =        'c'
 }FAN_MODE;
 
 typedef struct{
@@ -140,7 +138,6 @@ void loop(){
   byte duty_cycle = 255*(air/(afr*cylinders))/inj_hrs_mass;
   analogWrite(injector_bank_one, duty_cycle);
   analogWrite(injector_bank_two, duty_cycle);
-  
 }
 
 void ignition(){
@@ -230,28 +227,21 @@ void processSet(){
        Serial.println("DME relay offline.");
      }
      break;
-     case FAN_LO:
-      if(operation == ON){
+     case FAN:
+      if(operation == DISABLED){
+        digitalWrite(fan_hi, LOW);
+        digitalWrite(fan_lo, LOW);
+        Serial.println("Engine fan disabled.");
+      }
+      else if(operation == LO){
         digitalWrite(fan_hi, LOW);
         digitalWrite(fan_lo, HIGH);
-        Serial.println("Engine fan set to low speed.");
+        Serial.println("Engine fan set to low.");
       }
-      else{
-        digitalWrite(fan_lo, LOW);
-        digitalWrite(fan_hi, LOW);
-        Serial.println("Engine fan offline.");
-      }
-     break;
-     case FAN_HI:
-      if(operation == ON){
+      else if(operation == HI){
         digitalWrite(fan_lo, LOW);
         digitalWrite(fan_hi, HIGH);
-        Serial.println("Engine fan set to high speed.");
-      }
-      else{
-        digitalWrite(fan_lo, LOW);
-        digitalWrite(fan_hi, LOW);
-        Serial.println("Engine fan offline.");
+        Serial.println("Engine fan set to high.");
       }
      break;
      case IAC:
