@@ -72,6 +72,16 @@ class MockPoller(Poller):
                 self._injector = data[2] == 'a' and 1 or 0
             elif data[1] == 'h': # dme
                 self._dme = data[2] == 'a' and 1 or 0
+            elif data[1] == 'k': # fan low
+                if data[2] == 'a': # on
+                    self._fan = 1
+                else:
+                    self._fan = 0
+            elif data[1] == 'l': # fan high
+                if data[2] == 'a': # on
+                    self._fan = 2
+                else:
+                    self._fan = 0
             else:
                 print("unknown set operation:", data, file=sys.stderr)
         else:

@@ -5,6 +5,7 @@ from gi.repository import Gtk, Gdk, GLib, GObject
 import argparse
 import serial
 import sys, os
+import ctypes
 from struct import Struct
 from _mockup import MockPoller
 from _serial import SerialPoller
@@ -28,6 +29,8 @@ class App(object):
                 "btn_fuel_pump_pressed": self.btn_fuel_pump_pressed,
                 "btn_injector_pressed": self.btn_injector_pressed,
                 "btn_dme_pressed": self.btn_dme_pressed,
+                "fan_output": self.fan_output,
+                "fan_changed": self.fan_changed,
         })
         self.window = builder.get_object("window1")
         self.window.show()
@@ -51,9 +54,18 @@ class App(object):
         self.btn_fuel_pump       = builder.get_object('btn_fuel_pump')
         self.btn_injector        = builder.get_object('btn_injector')
         self.btn_dme             = builder.get_object('btn_dme')
+        self.adj_fan             = builder.get_object('adj_fan')
 
         self.poll = pollcls(self, **kwargs)
         self.poll.start()
+
+    def fan_output(self, spinner):
+        spinner.props.text = App.fan_mode[int(spinner.get_value())]
+        return True
+
+    def fan_changed(self, widget):
+        self.poll.set_fan(widget.get_value())
+        return True
     
     def btn_fuel_pump_pressed(self, widget):
         self.poll.set_fuel_pump(not widget.get_active())
@@ -68,6 +80,7 @@ class App(object):
         self.lb_iac.set_markup('%d' % value)
 
     def set_fan(self, value):
+        self.adj_fan.set_value(value)
         self.lb_fan.set_markup(App.fan_mode[value])
 
     def set_dme(self, value):

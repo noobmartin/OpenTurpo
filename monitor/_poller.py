@@ -21,6 +21,21 @@ class Poller(threading.Thread):
     def stop(self):
         self._run = False
 
+    def set_fan(self, value):
+        if int(value) == 0:
+            v = 'kb'
+        elif int(value) == 1:
+            v = 'ka'
+        elif int(value) == 2:
+            v = 'la'
+        else:
+            raise ValueError
+        with self.lock:
+            self.write('a' + v)
+            line = self.readline()
+            if line:
+                print('io:', line, file=sys.stderr)
+
     def set_fuel_pump(self, value):
         with self.lock:
             self.write('ac' + (value and 'a' or 'b'))
