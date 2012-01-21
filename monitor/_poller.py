@@ -23,18 +23,18 @@ class Poller(threading.Thread):
 
     def set_iac(self, value):
         with self.lock:
-            self.write('an' + chr(int(value)))
+            self.write('al' + chr(int(value)))
             line = self.readline()
             if line:
                 print('io:', line, file=sys.stderr)
 
     def set_fan(self, value):
         if int(value) == 0:
-            v = 'kb'
-        elif int(value) == 1:
             v = 'ka'
+        elif int(value) == 1:
+            v = 'kb'
         elif int(value) == 2:
-            v = 'la'
+            v = 'kc'
         else:
             raise ValueError
         with self.lock:
@@ -84,6 +84,8 @@ class Poller(threading.Thread):
             with self.lock:
                 self.write('ba')
                 data = self.read(status.size)
+		if len(data) == 0:
+		   continue
                 row = status.unpack(data)
 
             GObject.idle_add(self.app.set_iac, ord(row[0]))

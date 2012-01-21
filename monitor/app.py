@@ -131,7 +131,7 @@ class App(object):
         return True
 
 parser = argparse.ArgumentParser(description='Herp a derp.')
-parser.add_argument('-d', '--device', default='/dev/ttyS1')
+parser.add_argument('-d', '--device', default='/dev/ttyS0')
 parser.add_argument('-r', '--baudrate', default=9600, type=int)
 parser.add_argument('-t', '--pollrate', default=1000/25, type=int, help="Poll rate in ms")
 parser.add_argument('--mockup', dest='pollcls', action="store_const", default=SerialPoller, const=MockPoller, help="Disable serial communication and use mockup communication.")
