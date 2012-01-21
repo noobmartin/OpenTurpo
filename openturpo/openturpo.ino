@@ -95,8 +95,8 @@ int ign_6 = 27;
 int fuel_pump = 28;
 int inj_relay = 29;
 int dme_relay = 30;
-int fan_lo = 30;
-int fan_hi = 31;
+int fan_lo = 31;
+int fan_hi = 32;
 
 void setup(){
   /* Set the correct input/output pins. */
