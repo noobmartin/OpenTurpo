@@ -5,6 +5,7 @@ from __future__ import print_function
 import threading
 import time
 import sys
+import traceback
 from struct import Struct
 from gi.repository import GObject
 
@@ -76,29 +77,35 @@ class Poller(threading.Thread):
     def write(self, data):
         raise NotImplementedError
 
+    def poll(self):
+        with self.lock:
+            self.write('ba')
+            data = self.read(status.size)
+            if len(data) != status.size:
+                raise RuntimeError('Data received (%s) is not of correct length, got %d but expected %d' % ([data], len(data), status.size))
+        row = status.unpack(data)
+
+        GObject.idle_add(self.app.set_iac, ord(row[0]))
+        GObject.idle_add(self.app.set_fan, ord(row[1]))
+        GObject.idle_add(self.app.set_dme, ord(row[2]))
+        GObject.idle_add(self.app.set_fuel_pump, ord(row[3]))
+        GObject.idle_add(self.app.set_injector, ord(row[4]))
+        GObject.idle_add(self.app.set_lambda, row[5])
+        GObject.idle_add(self.app.set_amm, row[6])
+        GObject.idle_add(self.app.set_amm_temp, row[7])
+        GObject.idle_add(self.app.set_rpm, row[8])
+        GObject.idle_add(self.app.set_engine_temp, row[9])
+        GObject.idle_add(self.app.set_fuel_consumption, row[10])
+    
     def run(self):
         global status
         t = time.time()
         last = t
         while self._run:
-            with self.lock:
-                self.write('ba')
-                data = self.read(status.size)
-                if len(data) != status.size:
-                    raise RuntimeError('Data received (%s) is not of correct length, got %d but expected %d' % ([data], len(data), status.size))
-                row = status.unpack(data)
-
-            GObject.idle_add(self.app.set_iac, ord(row[0]))
-            GObject.idle_add(self.app.set_fan, ord(row[1]))
-            GObject.idle_add(self.app.set_dme, ord(row[2]))
-            GObject.idle_add(self.app.set_fuel_pump, ord(row[3]))
-            GObject.idle_add(self.app.set_injector, ord(row[4]))
-            GObject.idle_add(self.app.set_lambda, row[5])
-            GObject.idle_add(self.app.set_amm, row[6])
-            GObject.idle_add(self.app.set_amm_temp, row[7])
-            GObject.idle_add(self.app.set_rpm, row[8])
-            GObject.idle_add(self.app.set_engine_temp, row[9])
-            GObject.idle_add(self.app.set_fuel_consumption, row[10])
+            try:
+                self.poll()
+            except:
+                traceback.print_exc()
             
             now = time.time()
             wall = now - t
