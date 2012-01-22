@@ -76,6 +76,10 @@ float inj_hrs = inj*60;
 float inj_hrs_mass = inj_hrs*fuel_dens_avg/1000;
 
 int cylinders = 6;
+int flywheel_teeth = 142;
+int cylinder_deg_offset = 120;
+int cmp_interrupt_deg_before_tdc = 0;
+int spark_charge_usec = 4000;  // 4000us coil charge time (4ms).
 
 int amm = A0;
 int amm_temp = A1;
@@ -123,6 +127,10 @@ void setup(){
   
   analogWrite(iac, 255);
   
+  /* Set up interrupts. */
+  attachInterrupt(crk, crank_trigger, RISING);
+  attachInterrupt(cmp, ignition, RISING);
+  
   /* Set up serial communication. */
   Serial.begin(9600);
 }
@@ -144,7 +152,64 @@ void ignition(){
   /* This function is interrput triggered.
    * It is used for precise ignition timing for
    * all cylinders.
+   * All cylinders complete their total four strokes
+   * in two engine revolutions, i.e 720 degrees.
+   * Firing order is 1-5-3-6-2-4.
    */
+   detachInterrupt(cmp);
+   
+   // This can be adjusted to vary ignition timing in degrees depending on engine load, RPM etc.
+   int fire_deg_before_tdc = 15;
+
+   // As engine RPM varies, so does the time corresponding to one degree.
+   float usec_per_deg = ((60/(RPM))/360)*1000000;
+   
+   // The interrupt is triggered cmp_interrupt_deg_before_tdc degrees before tdc.
+   int sleep_deg_before_fire = cmp_interrupt_deg_before_tdc - fire_deg_before_tdc;
+
+   // We also need to take in to account the time it takes to charge the coil.
+   float sleep_usec_before_fire = usec_per_deg*sleep_deg_before_fire - spark_charge_usec;
+   
+   // First cylinder - the coil is fired when the signal goes low.
+   delayMicroseconds(sleep_usec_before_fire);
+   digitalWrite(ign_1, HIGH);
+   delayMicroseconds(spark_charge_usec);
+   digitalWrite(ign_1, LOW);
+
+   // After the first cylinder, all remaining cylinders have the same time offsets.
+   sleep_usec_before_fire = usec_per_deg*cylinder_deg_offset - spark_charge_usec;
+   
+   // Fifth cylinder.
+   delayMicroseconds(sleep_usec_before_fire);
+   digitalWrite(ign_5, HIGH);
+   delayMicroseconds(spark_charge_usec);
+   digitalWrite(ign_5, LOW);
+   
+   // Third cylinder.
+   delayMicroseconds(sleep_usec_before_fire);
+   digitalWrite(ign_3, HIGH);
+   delayMicroseconds(spark_charge_usec);
+   digitalWrite(ign_3, LOW);
+   
+   // Sixth cylinder.
+   delayMicroseconds(sleep_usec_before_fire);
+   digitalWrite(ign_6, HIGH);
+   delayMicroseconds(spark_charge_usec);
+   digitalWrite(ign_6, LOW);
+   
+   // Second cylinder.
+   delayMicroseconds(sleep_usec_before_fire);
+   digitalWrite(ign_2, HIGH);
+   delayMicroseconds(spark_charge_usec);
+   digitalWrite(ign_2, LOW);
+   
+   // Fourth cylinder.
+   delayMicroseconds(sleep_usec_before_fire);
+   digitalWrite(ign_4, HIGH);
+   delayMicroseconds(spark_charge_usec);
+   digitalWrite(ign_4, LOW);
+
+   attachInterrupt(cmp, ignition, RISING);
 }
 
 void crank_trigger(){
@@ -153,9 +218,15 @@ void crank_trigger(){
    * RPM.
    */
   static unsigned long last_time = 0;
-  unsigned long current_time = micros();
-  unsigned long time_diff = current_time - last_time;
-  static float RPM = 60000000/time_diff;
+  static int pulses = 0;
+  if(pulses >= flywheel_teeth){
+    unsigned long current_time = micros();
+    unsigned long time_diff = current_time - last_time;
+    static float RPM = 60000000/time_diff;
+    pulses = 0;
+  }
+  else
+    pulses++;
 }
 
 void serialEvent(){
