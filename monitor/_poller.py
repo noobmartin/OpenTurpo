@@ -84,8 +84,8 @@ class Poller(threading.Thread):
             with self.lock:
                 self.write('ba')
                 data = self.read(status.size)
-		if len(data) == 0:
-		   continue
+                if len(data) != 0:
+                    continue
                 row = status.unpack(data)
 
             GObject.idle_add(self.app.set_iac, ord(row[0]))
