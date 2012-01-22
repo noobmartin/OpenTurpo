@@ -7,7 +7,7 @@ from _poller import Frobnicator
 class SerialPoller(Frobnicator):
     def __init__(self, app, device, baudrate, **kwargs):
         Frobnicator.__init__(self, app, **kwargs)
-        self.ser = serial.Serial(port=device, baudrate=baudrate, timeout=1)
+        self.ser = serial.Serial(port=device, baudrate=baudrate, timeout=10)
         self._desc = "Serial Mode   Device: %s   Baud: %d" % (device, baudrate)
 
     def description(self):
