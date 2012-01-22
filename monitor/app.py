@@ -93,19 +93,19 @@ class App(object):
 
     def set_fan(self, value):
         self.adj_fan.set_value(value)
-        self.lb_fan.set_markup(App.fan_mode[value])
+        self.lb_fan.set_markup(App.fan_mode.get(value, 'Invalid (0x%02X)' % value))
 
     def set_dme(self, value):
         self.btn_dme.set_active(value == 1)
-        self.lb_dme.set_markup(App.relay_mode[value])
+        self.lb_dme.set_markup(App.relay_mode.get(value, 'Invalid (0x%02X)' % value))
 
     def set_injector(self, value):
         self.btn_injector.set_active(value == 1)
-        self.lb_injector.set_markup(App.relay_mode[value])
+        self.lb_injector.set_markup(App.relay_mode.get(value, 'Invalid (0x%02X)' % value))
 
     def set_fuel_pump(self, value):
         self.btn_fuel_pump.set_active(value == 1)
-        self.lb_fuel_pump.set_markup(App.relay_mode[value])
+        self.lb_fuel_pump.set_markup(App.relay_mode.get(value, 'Invalid (0x%02X)' % value))
 
     def set_lambda(self, value):
         self.lb_lambda.set_markup('%02.3fV' % value)
