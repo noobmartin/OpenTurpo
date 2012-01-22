@@ -11,7 +11,7 @@ from gi.repository import GObject
 
 status = Struct('cccccffffff')
 
-class Poller(threading.Thread):
+class Frobnicator(threading.Thread):
     def __init__(self, app, pollrate, **kwargs):
         threading.Thread.__init__(self)
         self.lock = threading.Lock()

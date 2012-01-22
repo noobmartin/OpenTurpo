@@ -2,7 +2,7 @@
 # -*- coding: utf-8; -*-
 
 from __future__ import print_function
-from _poller import Poller
+from _poller import Frobnicator
 from struct import Struct
 import random
 import sys
@@ -18,9 +18,9 @@ else:
     def encode(v):
         return chr(v)
 
-class MockPoller(Poller):
+class MockPoller(Frobnicator):
     def __init__(self, *args, **kwargs):
-        Poller.__init__(self, *args, **kwargs)
+        Frobnicator.__init__(self, *args, **kwargs)
 
         self._iac = random.randint(0,255)
         self._fan = random.randint(0,2)

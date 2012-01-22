@@ -2,11 +2,11 @@
 # -*- coding: utf-8; -*-
 
 import serial
-from _poller import Poller
+from _poller import Frobnicator
 
-class SerialPoller(Poller):
+class SerialPoller(Frobnicator):
     def __init__(self, app, device, baudrate, **kwargs):
-        Poller.__init__(self, app, **kwargs)
+        Frobnicator.__init__(self, app, **kwargs)
         self.ser = serial.Serial(port=device, baudrate=baudrate, timeout=1)
         self._desc = "Serial Mode   Device: %s   Baud: %d" % (device, baudrate)
 
