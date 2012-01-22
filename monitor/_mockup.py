@@ -84,7 +84,7 @@ class MockPoller(Frobnicator):
                     self._fan = 2
                 else:
                     raise ValueError
-            elif data[1] == 'n': # iac
+            elif data[1] == 'l': # iac
                 self._iac = ord(data[2])
             else:
                 raise ValueError("unknown set operation: %s" % ([data]), file=sys.stderr)
