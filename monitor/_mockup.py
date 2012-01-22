@@ -75,16 +75,15 @@ class MockPoller(Poller):
                 self._injector = data[2] == 'a' and 1 or 0
             elif data[1] == 'h': # dme
                 self._dme = data[2] == 'a' and 1 or 0
-            elif data[1] == 'k': # fan low
-                if data[2] == 'a': # on
-                    self._fan = 1
-                else:
+            elif data[1] == 'k': # fan
+                if data[2] == 'a': # disabled
                     self._fan = 0
-            elif data[1] == 'l': # fan high
-                if data[2] == 'a': # on
+                elif data[2] == 'b': # low
+                    self._fan = 1
+                elif data[2] == 'c': # high
                     self._fan = 2
                 else:
-                    self._fan = 0
+                    raise ValueError
             elif data[1] == 'n': # iac
                 self._iac = ord(data[2])
             else:
