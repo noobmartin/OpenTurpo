@@ -82,25 +82,29 @@ int cmp_interrupt_deg_before_tdc = 0;
 int spark_charge_usec = 4000;  // 4000us coil charge time (4ms).
 
 int amm = A0;
-int amm_temp = A1;
-int lambda = A2;
-int engine_temp = A4;
-int injector_bank_one = 4;
-int injector_bank_two = 5;
+int amm_temp = A2;
+int lambda = A4;
+int engine_temp = A6;
+int knock_front = A8
+int knock_rear = A10
+int tps = A12;
 int cmp = 2;
-int crk = 3;
-int iac = 6;
+int crk = 4;
+int injector_bank_one = 6;
+int injector_bank_two = 8;
+int iac = 10;
+int tach = 12;
 int ign_1 = 22;
-int ign_2 = 23;
-int ign_3 = 24;
-int ign_4 = 25;
-int ign_5 = 26;
-int ign_6 = 27;
-int fuel_pump = 28;
-int inj_relay = 29;
-int dme_relay = 30;
-int fan_lo = 31;
-int fan_hi = 32;
+int ign_2 = 26;
+int ign_3 = 30;
+int ign_4 = 23;
+int ign_5 = 49;
+int ign_6 = 53;
+int fuel_pump = 39;
+int inj_relay = 36;
+int dme_relay = 31;
+int fan_lo = 35;
+int fan_hi = 43;
 
 void setup(){
   /* Set the correct input/output pins. */
@@ -132,7 +136,7 @@ void setup(){
   attachInterrupt(cmp, ignition, RISING);
   
   /* Set up serial communication. */
-  Serial.begin(9600);
+  Serial.begin(115200);
 }
 
 void loop(){
@@ -234,7 +238,7 @@ void serialEvent(){
    * via the serial communication interface.
    */
    byte command = Serial.read();
-   Serial.println("Command received");
+   Serial.print("Command received");
    Serial.flush();
    switch(command){
     case SET:
