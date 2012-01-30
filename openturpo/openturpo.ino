@@ -18,11 +18,12 @@ enum{
   AMM_TEMP =        'e',
   ENGINE_TEMP =     'f',
   INJECTOR_RELAY =  'g',
-  DME_RELAY =       'h',
+  IGN_RELAY =       'h',
   RPM =             'i',
   FUEL_CONSUMPTION = 'j',
   FAN =             'k',
-  IAC =             'l'
+  IAC =             'l',
+  TPS =             'm'
 }DEVICE;
 
 enum{
@@ -39,9 +40,9 @@ enum{
 typedef struct{
   byte iac;
   byte fan;
-  byte dme_relay;
-  byte fuel_pump;
-  byte inj_relay;
+  byte inj_relay; // Fuel injectors
+  byte fuel_pump; // Fuel pump
+  byte ign_relay; // Ignition relay
   float lambda;
   float amm;
   float amm_temp;
@@ -74,57 +75,9 @@ float fuel_density[32] =
  * between 0-1023 that is read off the air mass meter.
  */
 float amm_table[1024] = {
- -3662.152539, -3201.209664, -2931.575367, -2740.266789, -2591.876327, 
- -2470.632492, -2368.122290, -2279.323914, -2200.998195, -2130.933452, 
- -2067.552183, -2009.689617, -1956.461216, -1907.179415, -1861.299155, 
- -1818.381039, -1778.065665, -1740.055320, -1704.100618, -1669.990577, 
- -1637.545118, -1606.609307, -1577.048885, -1548.746742, -1521.600115, 
- -1495.518341, -1470.421023, -1446.236540, -1422.900812, -1400.356280, 
- -1378.551048, -1357.438164, -1336.975011, -1317.122790, -1297.846078, 
- -1279.112445, -1260.892127, -1243.157743, -1225.884044, -1209.047702, 
- -1192.627115, -1176.602243, -1160.954462, -1145.666432, -1130.721983, 
- -1116.106010, -1101.804384, -1087.803867, -1074.092041, -1060.657240, 
- -1047.488493, -1034.575466, -1021.908416, -1009.478148, -997.275971, 
- -985.293665, -973.523446, -961.957937, -950.590139, -939.413405, 
- -928.421419, -917.608173, -906.967946, -896.495289, -886.185004, 
- -876.032136, -866.031947, -856.179915, -846.471713, -836.903203, 
- -827.470421, -818.169570, -808.997011, -799.949252, -791.022943, 
- -782.214868, -773.521933, -764.941169, -756.469717, -748.104827, 
- -739.843851, -731.684240, -723.623535, -715.659368, -707.789453, 
- -700.011587, -692.323640, -684.723557, -677.209353, -669.779108, 
- -662.430967, -655.163135, -647.973876, -640.861509, -633.824406, 
- -626.860992, -619.969738, -613.149166, -606.397839, -599.714365, 
- -593.097395, -586.545618, -580.057762, -573.632591, -567.268906, 
- -560.965541, -554.721364, -548.535273, -542.406197, -536.333096, 
- -530.314955, -524.350790, -518.439640, -512.580571, -506.772674, 
- -501.015062, -495.306872, -489.647264, -484.035416, -478.470530, 
- -472.951826, -467.478544, -462.049943, -456.665298, -451.323904, 
- -446.025071, -440.768126, -435.552413, -430.377290, -425.242129, 
- -420.146319, -415.089260, -410.070369, -405.089072, -400.144811, 
- -395.237040, -390.365223, -385.528838, -380.727373, -375.960328, 
- -371.227212, -366.527546, -361.860860, -357.226695, -352.624600, 
- -348.054136, -343.514869, -339.006377, -334.528246, -330.080068, 
- -325.661447, -321.271993, -316.911321, -312.579058, -308.274836, 
- -303.998294, -299.749078, -295.526842, -291.331244, -287.161952, 
- -283.018636, -278.900976, -274.808655, -270.741364, -266.698799, 
- -262.680660, -258.686654, -254.716493, -250.769894, -246.846578, 
- -242.946274, -239.068712, -235.213629, -231.380765, -227.569866, 
- -223.780682, -220.012967, -216.266478, -212.540978, -208.836233, 
- -205.152013, -201.488092, -197.844247, -194.220260, -190.615915, 
- -187.031001, -183.465309, -179.918634, -176.390774, -172.881531, 
- -169.390709, -165.918117, -162.463563, -159.026863, -155.607833, 
- -152.206291, -148.822059, -145.454964, -142.104831, -138.771490, 
- -135.454775, -132.154520, -128.870563, -125.602743, -122.350903, 
- -119.114887, -115.894541, -112.689716, -109.500261, -106.326031, 
- -103.166880, -100.022666, -96.893249, -93.778489, -90.678250, 
- -87.592398, -84.520799, -81.463322, -78.419839, -75.390221, 
- -72.374342, -69.372080, -66.383311, -63.407914, -60.445771, 
- -57.496764, -54.560777, -51.637696, -48.727407, -45.829799, 
- -42.944761, -40.072187, -37.211967, -34.363997, -31.528172, 
- -28.704389, -25.892545, -23.092541, -20.304277, -17.527655, 
- -14.762578, -12.008951, -9.266679, -6.535669, -3.815829, 
- -1.107068, 1.590705, 4.277577, 6.953637, 9.618971, 
- 12.273666, 14.917804, 17.551471, 20.174749, 22.787719, 
+       0.0, 0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,      0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0,       0.0, 
+       1.590705, 4.277577, 6.953637, 9.618971,  12.273666,
+       14.917804, 17.551471, 20.174749, 22.787719, 
  25.390462, 27.983058, 30.565585, 33.138122, 35.700746, 
  38.253532, 40.796556, 43.329892, 45.853615, 48.367795, 
  50.872506, 53.367819, 55.853803, 58.330528, 60.798064, 
@@ -289,20 +242,22 @@ float inj_hrs = inj*60;
 float inj_hrs_mass = inj_hrs*fuel_dens_avg/1000;
 
 int cylinders = 6;
-int flywheel_teeth = 142;
+int crank_teeth = 58;
 int cylinder_deg_offset = 120;
-int cmp_interrupt_deg_before_tdc = 0;
+int cmp_interrupt_deg_before_tdc = 90;
 int spark_charge_usec = 4000;  // 4000us coil charge time (4ms).
+int crank_threshold = 5;
+static int rpm = 0;
 
-int amm = A0;
+int amm = A15;
 int amm_temp = A2;
 int lambda = A4;
 int engine_temp = A6;
 int knock_front = A8;
-int knock_rear = A10;
-int tps = A12;
-int cmp = 2;
-int crk = 4;
+int knock_rear = A7;
+int tps = A11;
+int cmp = A13;
+int crk = A9;
 int injector_bank_one = 6;
 int injector_bank_two = 8;
 int iac = 10;
@@ -315,7 +270,7 @@ int ign_5 = 49;
 int ign_6 = 53;
 int fuel_pump = 39;
 int inj_relay = 36;
-int dme_relay = 31;
+int ign_relay = 31;
 int fan_lo = 35;
 int fan_hi = 43;
 
@@ -329,6 +284,7 @@ void setup(){
   pinMode(injector_bank_two, OUTPUT);
   pinMode(cmp, INPUT);
   pinMode(crk, INPUT);
+  pinMode(tps, INPUT);
   pinMode(iac, OUTPUT);
   pinMode(ign_1, OUTPUT);
   pinMode(ign_2, OUTPUT);
@@ -338,49 +294,104 @@ void setup(){
   pinMode(ign_6, OUTPUT);
   pinMode(fuel_pump, OUTPUT);
   pinMode(inj_relay, OUTPUT);
-  pinMode(dme_relay, OUTPUT);
+  pinMode(ign_relay, OUTPUT);
   pinMode(fan_lo, OUTPUT);
   pinMode(fan_hi, OUTPUT);
   
-  analogWrite(iac, 255);
+  analogWrite(iac, 175);
   
-  /* Set up interrupts. */
-  attachInterrupt(crk, crank_trigger, RISING);
-  attachInterrupt(cmp, ignition, RISING);
+  digitalWrite(fuel_pump, LOW);
+  digitalWrite(inj_relay, LOW);
+  digitalWrite(ign_relay, LOW);
   
   /* Set up serial communication. */
   Serial.begin(115200);
 }
 
 void loop(){
-  /* In here we continuously adjust fuel injector
-   * duty cycle based on air entering the engine.
-   * The operation is simple, and uses the signal from
-   * the air mass meter to set the correct fuel amount
-   * on average based on the air:fuel ratio.
-   */
-  float air = amm_table[analogRead(amm)];
-  byte duty_cycle = 255*(air/(afr*cylinders))/inj_hrs_mass;
+  static int running = 0;
+  if(rpm == 0){
+    digitalWrite(fuel_pump, LOW);
+    digitalWrite(inj_relay, LOW);
+    digitalWrite(ign_relay, LOW); 
+  }
+  else if(!running){
+    digitalWrite(fuel_pump, HIGH);
+    digitalWrite(inj_relay, HIGH);
+    digitalWrite(ign_relay, HIGH); 
+  }
+
+  /* This block of code adjusts fuel injector pulse width. */
+  int air_index = analogRead(amm);
+  float air = amm_table[air_index];
+  byte duty_cycle = 255*(air/(afr*cylinders))/inj_hrs_mass; 
   analogWrite(injector_bank_one, duty_cycle);
   analogWrite(injector_bank_two, duty_cycle);
+  /* END INJECTOR CODE */
   
+  /* This block of code processes the CRK signal
+   * and calculates engine RPM.
+   */
+  int crank_val = analogRead(crk);
+  unsigned long current_time = micros();
+  static int pulse_processed = 0;
+  if(!pulse_processed && (crank_val > crank_threshold)){
+    static unsigned long last_time = 0;
+    unsigned long time_diff = current_time - last_time;
+    Serial.print("Time difference: ");
+    Serial.println(time_diff);
+    Serial.print("Crank teeth: ");
+    Serial.println(crank_teeth);
+    rpm = 60000000/(time_diff*crank_teeth);
+    Serial.print("Calculated RPM: ");
+    Serial.println(rpm);
+    last_time = current_time;
+    pulse_processed = 1;
+    
+    running = 1;
+  }
+  static unsigned long last_time_zero = 0;
+  static int last_time_set = 0;
+  if(crank_val == 0){
+    if(!last_time_set){
+      last_time_zero = current_time;
+      last_time_set = 1;
+    }
+    // If the CRK signal has been 0 for 1.5 tooth times, it's ignition time! :D  
+    unsigned long trigger_time = 1.5*(60000000/rpm)/(crank_teeth+2);
+    if(current_time - last_time_zero >= trigger_time){
+      //Serial.println("-------");
+      //Serial.println(current_time);
+      //Serial.println(last_time_zero);
+      //Serial.println(trigger_time);
+      //Serial.println(current_time-last_time_zero);
+      last_time_set = 0;
+      if(rpm > 0)
+        ignition();
+    }
+    pulse_processed = 0;
+  }
+
+  /* END RPM CODE */
+
   /* Lambda = 1 corresponds to 0.45V -> 92 when converted to digital.
    * Acceptable lambda values lie between 0.2 - 0.6 V which corresponds to 
    * This code continuously adapts the AMM table and should as such only be used when
    * tuning this software for a specific AMM.
    * Once the AMM has been recorded to acceptable precision, this code should not be used.
    */
+  
   int oxygen = analogRead(lambda);
-  Serial.print("Oxygen value ");
-  Serial.println(oxygen);
+  Serial.print("Air: ");
+  Serial.println(air);
   int delta = 3;
   // Running too lean.
   if(oxygen < 41){
-    amm_table[analogRead(amm)] -=delta;
+    amm_table[air_index] -=delta;
   }
   // Running too rich.
   else if(oxygen > 123){
-    amm_table[analogRead(amm)] +=delta;
+    amm_table[air_index] +=delta;
   }
   
 }
@@ -398,22 +409,16 @@ void ignition(){
     * It can also be used in conjunction with the test code for the crank interrupt
     * to calculate how many crank pulses there are per cam pulse.
     */
-    
-   static int counter = 0;
-   
-   counter++;
-   
-   Serial.print("Cam pulses: ");
-   Serial.println(counter);
-   
-   /*
-   detachInterrupt(cmp);
-   
+  
+    Serial.println("IGNITION");
+    Serial.print("RPM: ");
+    Serial.println(rpm);
+  
    // This can be adjusted to vary ignition timing in degrees depending on engine load, RPM etc.
    int fire_deg_before_tdc = 15;
 
    // As engine RPM varies, so does the time corresponding to one degree.
-   float usec_per_deg = ((60/(RPM))/360)*1000000;
+   float usec_per_deg = ((60/(rpm))/360)*1000000;
    
    // The interrupt is triggered cmp_interrupt_deg_before_tdc degrees before tdc.
    int sleep_deg_before_fire = cmp_interrupt_deg_before_tdc - fire_deg_before_tdc;
@@ -424,8 +429,10 @@ void ignition(){
    // First cylinder - the coil is fired when the signal goes low.
    delayMicroseconds(sleep_usec_before_fire);
    digitalWrite(ign_1, HIGH);
+   digitalWrite(ign_6, HIGH);
    delayMicroseconds(spark_charge_usec);
    digitalWrite(ign_1, LOW);
+   digitalWrite(ign_6, LOW);
 
    // After the first cylinder, all remaining cylinders have the same time offsets.
    sleep_usec_before_fire = usec_per_deg*cylinder_deg_offset - spark_charge_usec;
@@ -433,67 +440,42 @@ void ignition(){
    // Fifth cylinder.
    delayMicroseconds(sleep_usec_before_fire);
    digitalWrite(ign_5, HIGH);
+   digitalWrite(ign_2, HIGH);
    delayMicroseconds(spark_charge_usec);
    digitalWrite(ign_5, LOW);
+   digitalWrite(ign_2, LOW);
    
    // Third cylinder.
    delayMicroseconds(sleep_usec_before_fire);
    digitalWrite(ign_3, HIGH);
+   digitalWrite(ign_4, HIGH);
    delayMicroseconds(spark_charge_usec);
    digitalWrite(ign_3, LOW);
+   digitalWrite(ign_5, LOW);
    
    // Sixth cylinder.
    delayMicroseconds(sleep_usec_before_fire);
    digitalWrite(ign_6, HIGH);
+   digitalWrite(ign_1, HIGH);
    delayMicroseconds(spark_charge_usec);
    digitalWrite(ign_6, LOW);
+   digitalWrite(ign_1, LOW);
    
    // Second cylinder.
    delayMicroseconds(sleep_usec_before_fire);
    digitalWrite(ign_2, HIGH);
+   digitalWrite(ign_5, HIGH);
    delayMicroseconds(spark_charge_usec);
    digitalWrite(ign_2, LOW);
+   digitalWrite(ign_5, LOW);
    
    // Fourth cylinder.
    delayMicroseconds(sleep_usec_before_fire);
    digitalWrite(ign_4, HIGH);
+   digitalWrite(ign_3, HIGH);
    delayMicroseconds(spark_charge_usec);
    digitalWrite(ign_4, LOW);
-
-   attachInterrupt(cmp, ignition, RISING);
-   
-   */
-}
-
-void crank_trigger(){
-  /* In this function we use the trigger pulses from
-   * the crankshaft to continuously update engine
-   * RPM.
-   */
-   
-   /* The following code is used for testing that interrupts are triggered.
-    * It is also used to calculate the number of interrupts per engine revolution,
-    * which will be needed to later continuously calculating engine RPM.
-    */
-    
-  static int counter = 0;
-  
-  counter++;
-  Serial.print("Crank pulses: ");
-  Serial.println(counter);
-   
-  /* 
-  static unsigned long last_time = 0;
-  static int pulses = 0;
-  if(pulses >= flywheel_teeth){
-    unsigned long current_time = micros();
-    unsigned long time_diff = current_time - last_time;
-    static float RPM = 60000000/time_diff;
-    pulses = 0;
-  }
-  else
-    pulses++;
-  */
+   digitalWrite(ign_3, LOW);
 }
 
 void serialEvent(){
@@ -501,7 +483,7 @@ void serialEvent(){
    * via the serial communication interface.
    */
    byte command = Serial.read();
-   Serial.print("Command received");
+   Serial.println("Command received");
    Serial.flush();
    switch(command){
     case SET:
@@ -524,13 +506,13 @@ void processSet(){
       if(operation == ON){
         digitalWrite(fuel_pump, HIGH);
         digitalWrite(inj_relay, HIGH);
-        digitalWrite(dme_relay, HIGH);
+        digitalWrite(inj_relay, HIGH);
         Serial.println("All relays online.");
       }
       else{
         digitalWrite(fuel_pump, LOW);
         digitalWrite(inj_relay, LOW);
-        digitalWrite(dme_relay, LOW);
+        digitalWrite(inj_relay, LOW);
         Serial.println("All relays offline.");
       }
       break;
@@ -555,13 +537,13 @@ void processSet(){
        Serial.println("Injectors offline."); 
      }
      break;
-    case DME_RELAY:
+    case IGN_RELAY:
      if(operation == ON){
-       digitalWrite(dme_relay, HIGH);
+       digitalWrite(ign_relay, HIGH);
        Serial.println("DME relay online."); 
      }
      else{
-       digitalWrite(dme_relay, LOW);
+       digitalWrite(ign_relay, LOW);
        Serial.println("DME relay offline.");
      }
      break;
@@ -603,6 +585,9 @@ void processRead(){
       /* Do not know if this is correct since iac is set to OUTPUT mode. */
       Serial.write(analogRead(iac));
     break;
+    case TPS:
+      Serial.println(analogRead(tps));
+    break;
     case FAN:
       if(bitRead(PORTD, fan_lo)){
         Serial.write(LO);
@@ -614,8 +599,8 @@ void processRead(){
         Serial.write(DISABLED);
       }
     break;
-    case DME_RELAY:
-      Serial.write(bitRead(PORTD, dme_relay));
+    case IGN_RELAY:
+      Serial.write(bitRead(PORTD, ign_relay));
     break;
     case INJECTOR_RELAY:
       Serial.write(bitRead(PORTD, inj_relay));
@@ -627,7 +612,7 @@ void processRead(){
       Serial.write(analogRead(lambda));
     break;
     case AMM:
-      Serial.write(amm_conversion(analogRead(amm)));
+      Serial.write(amm_table[analogRead(amm)]);
     break;
     case AMM_TEMP:
       Serial.write(amm_temp_conversion(analogRead(amm_temp)));
@@ -650,13 +635,13 @@ void processRead(){
       }
       /* Do not know if the following line is correct or not. */
       sensor_data.iac = analogRead(iac);
-      sensor_data.dme_relay = bitRead(PORTD, dme_relay);
+      sensor_data.inj_relay = bitRead(PORTD, inj_relay);
       sensor_data.fuel_pump = bitRead(PORTD, fuel_pump);
       sensor_data.inj_relay = bitRead(PORTD, inj_relay);
       sensor_data.lambda = analogRead(lambda);
-      sensor_data.amm = amm_conversion(analogRead(amm));
+      sensor_data.amm = amm_table[analogRead(amm)];
       sensor_data.amm_temp = amm_temp_conversion(analogRead(amm_temp));
-      sensor_data.rpm = RPM;
+      sensor_data.rpm = rpm;
       sensor_data.engine_temp = engine_temp_conversion(analogRead(engine_temp));
       sensor_data.fuel_consumption = 0;
       Serial.write((uint8_t*)&sensor_data, sizeof(full_sensor_data));
@@ -671,11 +656,6 @@ void write_amm_to_eeprom(){
 float engine_temp_conversion(int engine_temp){
  /* Simple table lookup. */
  return 0; 
-}
-
-float amm_conversion(int amm){
-  /* Simple table lookup. */
-  return 0;
 }
 
 float amm_temp_conversion(int amm_temp){
