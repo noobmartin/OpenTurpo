@@ -250,29 +250,28 @@ int crank_threshold = 5;
 static int rpm = 0;
 
 int amm = A15;
-int amm_temp = A2;
-int lambda = A4;
-int engine_temp = A6;
-int knock_front = A8;
-int knock_rear = A7;
+int amm_temp = A1;
+int lambda = A3;
+int engine_temp = A5;
+int knock_front = A7;
+int knock_rear = A9;
 int tps = A11;
 int cmp = A13;
-int crk = A9;
+int crk = A0;
 int injector_bank_one = 6;
 int injector_bank_two = 8;
 int iac = 10;
 int tach = 12;
-int ign_1 = 22;
-int ign_2 = 26;
-int ign_3 = 30;
-int ign_4 = 23;
+int ign_1 = 33;
+int ign_2 = 37;
+int ign_3 = 41;
+int ign_4 = 45;
 int ign_5 = 49;
 int ign_6 = 53;
-int fuel_pump = 39;
-int inj_relay = 36;
-int ign_relay = 31;
-int fan_lo = 35;
-int fan_hi = 43;
+int fuel_pump = 28;
+int inj_relay = 22;
+int fan_lo = 23;
+int fan_hi = 25;
 
 void setup(){
   /* Set the correct input/output pins. */
@@ -294,33 +293,19 @@ void setup(){
   pinMode(ign_6, OUTPUT);
   pinMode(fuel_pump, OUTPUT);
   pinMode(inj_relay, OUTPUT);
-  pinMode(ign_relay, OUTPUT);
   pinMode(fan_lo, OUTPUT);
   pinMode(fan_hi, OUTPUT);
   
   analogWrite(iac, 175);
   
-  digitalWrite(fuel_pump, LOW);
-  digitalWrite(inj_relay, LOW);
-  digitalWrite(ign_relay, LOW);
+  digitalWrite(fuel_pump, HIGH);
+  digitalWrite(inj_relay, HIGH);
   
   /* Set up serial communication. */
   Serial.begin(115200);
 }
 
 void loop(){
-  static int running = 0;
-  if(rpm == 0){
-    digitalWrite(fuel_pump, LOW);
-    digitalWrite(inj_relay, LOW);
-    digitalWrite(ign_relay, LOW); 
-  }
-  else if(!running){
-    digitalWrite(fuel_pump, HIGH);
-    digitalWrite(inj_relay, HIGH);
-    digitalWrite(ign_relay, HIGH); 
-  }
-
   /* This block of code adjusts fuel injector pulse width. */
   int air_index = analogRead(amm);
   float air = amm_table[air_index];
@@ -332,46 +317,39 @@ void loop(){
   /* This block of code processes the CRK signal
    * and calculates engine RPM.
    */
-  int crank_val = analogRead(crk);
-  unsigned long current_time = micros();
   static int pulse_processed = 0;
+  static unsigned long last_time = 0;
+  unsigned long current_time = micros();
+  
+  int crank_val = analogRead(crk);
   if(!pulse_processed && (crank_val > crank_threshold)){
-    static unsigned long last_time = 0;
     unsigned long time_diff = current_time - last_time;
-    Serial.print("Time difference: ");
-    Serial.println(time_diff);
-    Serial.print("Crank teeth: ");
-    Serial.println(crank_teeth);
     rpm = 60000000/(time_diff*crank_teeth);
-    Serial.print("Calculated RPM: ");
-    Serial.println(rpm);
     last_time = current_time;
     pulse_processed = 1;
     
-    running = 1;
+    Serial.print("Calculated RPM: ");
+    Serial.println(rpm);
   }
-  static unsigned long last_time_zero = 0;
-  static int last_time_set = 0;
+  
+  static unsigned long first_time_zero = 0;
+  static int previous_zero = 0;
   if(crank_val == 0){
-    if(!last_time_set){
-      last_time_zero = current_time;
-      last_time_set = 1;
+    pulse_processed = 0;
+    
+    if(!previous_zero){
+      first_time_zero = current_time;
+      previous_zero = 1;
     }
+    
     // If the CRK signal has been 0 for 1.5 tooth times, it's ignition time! :D  
     unsigned long trigger_time = 1.5*(60000000/rpm)/(crank_teeth+2);
-    if(current_time - last_time_zero >= trigger_time){
-      //Serial.println("-------");
-      //Serial.println(current_time);
-      //Serial.println(last_time_zero);
-      //Serial.println(trigger_time);
-      //Serial.println(current_time-last_time_zero);
-      last_time_set = 0;
+    if(current_time - first_time_zero >= trigger_time){
+      previous_zero = 0;
       if(rpm > 0)
         ignition();
     }
-    pulse_processed = 0;
   }
-
   /* END RPM CODE */
 
   /* Lambda = 1 corresponds to 0.45V -> 92 when converted to digital.
@@ -382,8 +360,8 @@ void loop(){
    */
   
   int oxygen = analogRead(lambda);
-  Serial.print("Air: ");
-  Serial.println(air);
+  //Serial.print("Air: ");
+  //Serial.println(air);
   int delta = 3;
   // Running too lean.
   if(oxygen < 41){
@@ -416,14 +394,8 @@ void ignition(){
   
    // This can be adjusted to vary ignition timing in degrees depending on engine load, RPM etc.
    int fire_deg_before_tdc = 15;
-
-   // As engine RPM varies, so does the time corresponding to one degree.
-   float usec_per_deg = ((60/(rpm))/360)*1000000;
-   
-   // The interrupt is triggered cmp_interrupt_deg_before_tdc degrees before tdc.
-   int sleep_deg_before_fire = cmp_interrupt_deg_before_tdc - fire_deg_before_tdc;
-
-   // We also need to take in to account the time it takes to charge the coil.
+   float usec_per_deg = 60000000/(rpm*360);
+   float sleep_deg_before_fire = cmp_interrupt_deg_before_tdc - fire_deg_before_tdc;
    float sleep_usec_before_fire = usec_per_deg*sleep_deg_before_fire - spark_charge_usec;
    
    // First cylinder - the coil is fired when the signal goes low.
@@ -537,16 +509,6 @@ void processSet(){
        Serial.println("Injectors offline."); 
      }
      break;
-    case IGN_RELAY:
-     if(operation == ON){
-       digitalWrite(ign_relay, HIGH);
-       Serial.println("DME relay online."); 
-     }
-     else{
-       digitalWrite(ign_relay, LOW);
-       Serial.println("DME relay offline.");
-     }
-     break;
      case FAN:
       if(operation == DISABLED){
         digitalWrite(fan_hi, LOW);
@@ -598,9 +560,6 @@ void processRead(){
       else{
         Serial.write(DISABLED);
       }
-    break;
-    case IGN_RELAY:
-      Serial.write(bitRead(PORTD, ign_relay));
     break;
     case INJECTOR_RELAY:
       Serial.write(bitRead(PORTD, inj_relay));
