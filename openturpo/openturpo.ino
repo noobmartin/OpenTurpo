@@ -17,7 +17,7 @@ enum{
   AMM =             'd',
   AMM_TEMP =        'e',
   ENGINE_TEMP =     'f',
-  INJECTOR_RELAY =  'g',
+  INJECTOR_RELAY =  'g', 
   IGN_RELAY =       'h',
   RPM =             'i',
   FUEL_CONSUMPTION = 'j',
@@ -258,8 +258,8 @@ int knock_rear = A9;
 int tps = A11;
 int cmp = A13;
 int crk = A0;
-int injector_bank_one = 6;
-int injector_bank_two = 8;
+int injector_bank_one = 2;
+int injector_bank_two = 4;
 int iac = 10;
 int tach = 12;
 int ign_1 = 33;
@@ -309,10 +309,14 @@ void loop(){
   /* This block of code adjusts fuel injector pulse width. */
   int air_index = analogRead(amm);
   float air = amm_table[air_index];
-  byte duty_cycle = 255*(air/(afr*cylinders))/inj_hrs_mass; 
+  byte duty_cycle = 255*(air/(afr*cylinders*inj_hrs_mass));
+  duty_cycle = 0;
   analogWrite(injector_bank_one, duty_cycle);
   analogWrite(injector_bank_two, duty_cycle);
   /* END INJECTOR CODE */
+  
+  //Serial.print("Duty cycle: %i\n");
+  //Serial.println(duty_cycle);
   
   /* This block of code processes the CRK signal
    * and calculates engine RPM.
@@ -387,13 +391,12 @@ void ignition(){
     * It can also be used in conjunction with the test code for the crank interrupt
     * to calculate how many crank pulses there are per cam pulse.
     */
-  
     Serial.println("IGNITION");
     Serial.print("RPM: ");
     Serial.println(rpm);
-  
+   
    // This can be adjusted to vary ignition timing in degrees depending on engine load, RPM etc.
-   int fire_deg_before_tdc = 15;
+   int fire_deg_before_tdc = 5;
    float usec_per_deg = 60000000/(rpm*360);
    float sleep_deg_before_fire = cmp_interrupt_deg_before_tdc - fire_deg_before_tdc;
    float sleep_usec_before_fire = usec_per_deg*sleep_deg_before_fire - spark_charge_usec;
