@@ -7,7 +7,7 @@ class idleManager{
   public:
     idleManager();
     ~idleManager();
-    void update();
+    void update(float rpm);
   private:
   
 };

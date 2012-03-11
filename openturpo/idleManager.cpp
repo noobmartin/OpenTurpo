@@ -8,6 +8,6 @@ idleManager::~idleManager(){
   
 }
 
-void idleManager::update(){
+void idleManager::update(float rpm){
   digitalWrite(iac_motor, 0);
 }

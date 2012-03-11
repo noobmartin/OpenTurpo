@@ -45,7 +45,7 @@ void loop(){
   injector_manager.update(rpm);
   ignition_manager.setRPM(rpm);
   ignition_manager.update();
-  idle_manager.update();
+  idle_manager.update(rpm);
   
   static unsigned long int last_time_printed = 0;
   
