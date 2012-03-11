@@ -31,6 +31,7 @@
 #define cylinder_deg_offset 120
 #define cmp_interrupt_deg_before_tdc 90
 #define serial_baud_rate 115200
+#define ign_charge_time 4000
 
 enum ENGINE_STATE{
   ENGINE_OFF,
@@ -43,7 +44,7 @@ enum IGNITION_STATE{
   IGN_FIND_TRIGGER,
   IGN_WAIT_FIRST_PAIR,
   IGN_WAIT_SECOND_PAIR,
-  IGN_WAIT_THIRD_PAIR
+  IGN_WAIT_THIRD_PAIR,
 };
 
 #endif
