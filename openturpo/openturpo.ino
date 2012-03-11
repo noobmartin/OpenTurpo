@@ -42,7 +42,7 @@ void loop(){
   rpm_manager.update();
   float rpm = rpm_manager.getRPM();
   relay_manager.update(rpm);
-  injector_manager.update();
+  injector_manager.update(rpm);
   ignition_manager.setRPM(rpm);
   ignition_manager.update();
   idle_manager.update();

@@ -16,11 +16,14 @@ injectorManager::~injectorManager(){
   
 }
 
-void injectorManager::update(){
-  air_index = analogRead(amm_sensor);
-  air = 10.07*pow(air_index, 1.9544345015);
-  duty_cycle = 255*(air/(afr*cylinders*inj_hrs_mass));
-
+void injectorManager::update(float rpm){
+  if(rpm){
+    air_index = analogRead(amm_sensor);
+    air = 10.07*pow(air_index, 1.9544345015);
+    duty_cycle = 255*(air/(afr*cylinders*inj_hrs_mass));
+  }
+  else
+    duty_cycle = 0;
   analogWrite(inj_bank_one, duty_cycle);
   analogWrite(inj_bank_two, duty_cycle);
 }

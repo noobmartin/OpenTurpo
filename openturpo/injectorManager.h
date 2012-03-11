@@ -5,7 +5,7 @@ class injectorManager{
   public:
      injectorManager();
      ~injectorManager();
-     void update();
+     void update(float rpm);
      float getAirVoltage();
      float getAir();
      unsigned int getDutyCycle();
