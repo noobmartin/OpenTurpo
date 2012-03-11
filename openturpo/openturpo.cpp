@@ -1,4 +1,5 @@
 #include "common.h"
+#include <Arduino.h>
 
 void setup(){
   pinMode(amm_sensor_temp, INPUT);
@@ -26,5 +27,5 @@ void setup(){
 }
 
 void loop(){
-  
+  logger::logMessage("Testing logmessage");
 }

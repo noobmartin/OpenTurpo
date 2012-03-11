@@ -2,6 +2,7 @@
 #define common_h
 
 #include <Arduino.h>
+#include "logger.h"
 
 #define positive_crank_threshold 5
 #define crank_teeth 58
