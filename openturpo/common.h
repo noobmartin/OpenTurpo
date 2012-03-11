@@ -8,8 +8,8 @@
 #define crank_teeth 58
 #define inj_bank_one 2
 #define inj_bank_two 4
-#define crk_sensor A8
-#define amm_sensor A15
+#define crk_sensor A15
+#define amm_sensor A0
 #define amm_sensor_temp  A1
 #define lambda_sensor  A3
 #define engine_temp_sensor A5
