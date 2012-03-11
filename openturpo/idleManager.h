@@ -8,8 +8,9 @@ class idleManager{
     idleManager();
     ~idleManager();
     void update(float rpm);
+    unsigned int getThrottle();
   private:
-  
+    unsigned int throttle_value;
 };
 
 #endif
