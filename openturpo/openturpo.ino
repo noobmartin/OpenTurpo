@@ -2,12 +2,14 @@
 #include "ignitionManager.h"
 #include "injectorManager.h"
 #include "rpmManager.h"
+#include "idleManager.h"
 #include <Arduino.h>
 
 static rpmManager rpm_manager;
 static injectorManager injector_manager;
 static ignitionManager ignition_manager;
-static logger		   logger_instance;
+static idleManager idle_manager;
+static logger logger_instance;
 
 void setup(){
   pinMode(amm_sensor_temp, INPUT);
@@ -39,6 +41,7 @@ void loop(){
   injector_manager.update();
   ignition_manager.setRPM(rpm_manager.getRPM());
   ignition_manager.update();
+  idle_manager.update();
   
   static unsigned long int last_time_printed = 0;
   
