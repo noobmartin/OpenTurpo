@@ -36,3 +36,11 @@ float injectorManager::getAirVoltage(){
 unsigned int injectorManager::getDutyCycle(){
   return duty_cycle;
 }
+
+unsigned int injectorManager::getLambda() {
+  return lambda;
+}
+
+float injectorManager::getLambdaVoltage() {
+  return (5 * lambda) / 1024;
+}

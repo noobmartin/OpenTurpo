@@ -1,5 +1,13 @@
 #include "common.h"
+#include "ignitionManager.h"
+#include "injectorManager.h"
+#include "rpmManager.h"
 #include <Arduino.h>
+
+static rpmManager rpm_manager;
+static injectorManager injector_manager;
+static ignitionManager ignition_manager;
+static logger		   logger_instance;
 
 void setup(){
   pinMode(amm_sensor_temp, INPUT);
@@ -26,9 +34,22 @@ void setup(){
   Serial.begin(serial_baud_rate);
 }
 
-logger logger_instance;
-
 void loop(){
-	logger_instance.logMessage("RPM", 2500);
-	logger_instance.logMessage("AMM", 250.0f);
+  rpm_manager.update();
+  injector_manager.update();
+  ignition_manager.setRPM(rpm_manager.getRPM());
+  ignition_manager.update();
+  
+  static unsigned long int last_time_printed = 0;
+  
+  if (micros() - last_time_printed > 1000000) {
+	  // RPM, dutycycle, airvoltage, lamdavoltage,
+	  Serial.println("*********************************************");
+	  logger_instance.logMessage("RPM", rpm_manager.getRPM());
+	  logger_instance.logMessage("Duty cycle", injector_manager.getDutyCycle());
+	  logger_instance.logMessage("Air voltage", injector_manager.getAirVoltage());
+	  logger_instance.logMessage("Lamda voltage", injector_manager.getLambdaVoltage());
+	  Serial.println("*********************************************\n");
+	  last_time_printed = micros();
+  }
 }

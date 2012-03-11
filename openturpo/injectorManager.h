@@ -9,6 +9,8 @@ class injectorManager{
      float getAirVoltage();
      float getAir();
      unsigned int getDutyCycle();
+     unsigned int getLambda();
+     float getLambdaVoltage();
   private:
     int injector_flow_rate;
     int cylinders;
@@ -18,6 +20,7 @@ class injectorManager{
     float afr;
     float inj_hrs_mass;
     float fuel_dens_avg;
+    unsigned int lambda;
 };
 
 #endif

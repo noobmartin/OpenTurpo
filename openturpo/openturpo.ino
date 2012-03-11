@@ -7,6 +7,7 @@
 static rpmManager rpm_manager;
 static injectorManager injector_manager;
 static ignitionManager ignition_manager;
+static logger		   logger_instance;
 
 void setup(){
   pinMode(amm_sensor_temp, INPUT);
@@ -38,5 +39,17 @@ void loop(){
   injector_manager.update();
   ignition_manager.setRPM(rpm_manager.getRPM());
   ignition_manager.update();
-  logger::logMessage("Testing logmessage");
+  
+  static unsigned long int last_time_printed = 0;
+  
+  if (micros() - last_time_printed > 1000000) {
+	  // RPM, dutycycle, airvoltage, lamdavoltage,
+	  Serial.println("*********************************************");
+	  logger_instance.logMessage("RPM", rpm_manager.getRPM());
+	  logger_instance.logMessage("Duty cycle", injector_manager.getDutyCycle());
+	  logger_instance.logMessage("Air voltage", injector_manager.getAirVoltage());
+	  logger_instance.logMessage("Lamda voltage", injector_manager.getLambdaVoltage());
+	  Serial.println("*********************************************\n");
+	  last_time_printed = micros();
+  }
 }

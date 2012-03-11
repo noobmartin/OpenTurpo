@@ -10,6 +10,7 @@ public:
 	void logMessage(char const *message);
 	void logMessage(const char *message, float value);
 	void logMessage(const char *message, int value);
+	void logMessage(const char *message, unsigned int value);
 
 private:
 };
