@@ -26,6 +26,9 @@ void setup(){
   Serial.begin(serial_baud_rate);
 }
 
+logger logger_instance;
+
 void loop(){
-  logger::logMessage("Testing logmessage");
+	logger_instance.logMessage("RPM", 2500);
+	logger_instance.logMessage("AMM", 250.0f);
 }
