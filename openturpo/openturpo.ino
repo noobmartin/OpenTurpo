@@ -3,12 +3,14 @@
 #include "injectorManager.h"
 #include "rpmManager.h"
 #include "idleManager.h"
+#include "relayManager.h"
 #include <Arduino.h>
 
 static rpmManager rpm_manager;
 static injectorManager injector_manager;
 static ignitionManager ignition_manager;
 static idleManager idle_manager;
+static relayManager relay_manager;
 static logger logger_instance;
 
 void setup(){
@@ -38,8 +40,10 @@ void setup(){
 
 void loop(){
   rpm_manager.update();
+  float rpm = rpm_manager.getRPM();
+  relay_manager.update(rpm);
   injector_manager.update();
-  ignition_manager.setRPM(rpm_manager.getRPM());
+  ignition_manager.setRPM(rpm);
   ignition_manager.update();
   idle_manager.update();
   
