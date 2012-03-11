@@ -52,6 +52,14 @@ void loop(){
   if (micros() - last_time_printed > 1000000) {
 	  // RPM, dutycycle, airvoltage, lamdavoltage,
 	  Serial.println("*********************************************");
+          if(relay_manager.getFuelPumpState())
+            logger_instance.logMessage("Fuel pump: ON");
+          else
+            logger_instance.logMessage("Fuel pump: OFF");
+          if(relay_manager.getInjectorsState())
+            logger_instance.logMessage("Injectors: ON");
+          else
+            logger_instance.logMessage("Injectors: OFF");
 	  logger_instance.logMessage("RPM", rpm_manager.getRPM());
 	  logger_instance.logMessage("Duty cycle", injector_manager.getDutyCycle());
 	  logger_instance.logMessage("Air voltage", injector_manager.getAirVoltage());

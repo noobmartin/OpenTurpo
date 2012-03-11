@@ -2,7 +2,8 @@
 #include "common.h"
 
 relayManager::relayManager(){
-  
+  fuelPumpOn = false;
+  injectorsOn = false;
 }
 
 relayManager::~relayManager(){
@@ -56,4 +57,12 @@ void relayManager::enableInjectors(){
 void relayManager::disableInjectors(){
   digitalWrite(injector_relay, LOW);
   injectorsOn = false;
+}
+
+int relayManager::getFuelPumpState(){
+ return fuelPumpOn; 
+}
+
+int relayManager::getInjectorsState(){
+  return injectorsOn;
 }

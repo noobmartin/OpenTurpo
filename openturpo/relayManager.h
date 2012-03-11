@@ -8,6 +8,8 @@ class relayManager{
     void update(float rpm);
     int fuelPumpOn;
     int injectorsOn;
+    int getFuelPumpState();
+    int getInjectorsState();
   private:
     void enableRelays();
     void disableRelays();
