@@ -43,3 +43,12 @@ void logger::logMessage(const char *message, unsigned int value) {
 	Serial.print(": ");
 	Serial.println(value);
 }
+
+void logger::logMessage(const char* message, byte value) {
+  	Serial.print("[Uptime ");
+	Serial.print(micros() * MICROS_TO_SECONDS);
+	Serial.print(" seconds]: ");
+	Serial.print(message);
+	Serial.print(": ");
+	Serial.println(value);
+}

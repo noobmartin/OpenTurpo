@@ -4,7 +4,7 @@ ignitionManager::ignitionManager(){
   spark_charge_time_us = 4000;
   ign_state = IGN_FIND_TRIGGER;
   rpm = 0;
-  ignition_advance = 10;
+  ignition_advance = 15;
 }
 
 ignitionManager::~ignitionManager(){

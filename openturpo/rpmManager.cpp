@@ -21,14 +21,19 @@ void rpmManager::update(){
    }
   }
   else if(crk_value == 0){
+   unsigned long now = micros();
    if(nonzero_captured){
-    unsigned long now = micros();
     unsigned long pulse_time = now - zero_start_time;
     
     rpm = 60000000/(pulse_time*crank_teeth);
     
     nonzero_captured = 0;
     zero_start_time = now;
+   }
+   else if(zero_start_time != 0){
+     if(now - zero_start_time >= rpm_zero_shutoff_time ){
+      rpm = 0; 
+     }
    }
    else{
     zero_start_time = micros();

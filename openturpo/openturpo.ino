@@ -60,6 +60,7 @@ void loop(){
             logger_instance.logMessage("Injectors: ON");
           else
             logger_instance.logMessage("Injectors: OFF");
+          logger_instance.logMessage("Idle motor value", idle_manager.getIacValue());
 	  logger_instance.logMessage("RPM", rpm_manager.getRPM());
 	  logger_instance.logMessage("Duty cycle", injector_manager.getDutyCycle());
 	  logger_instance.logMessage("Air voltage", injector_manager.getAirVoltage());

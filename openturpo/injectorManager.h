@@ -1,6 +1,8 @@
 #ifndef injectorManager_h
 #define injectorManager_h
 
+#include <Arduino.h>
+
 class injectorManager{
   public:
      injectorManager();
@@ -8,7 +10,7 @@ class injectorManager{
      void update(float rpm);
      float getAirVoltage();
      float getAir();
-     unsigned int getDutyCycle();
+     byte getDutyCycle();
      unsigned int getLambda();
      float getLambdaVoltage();
   private:
@@ -16,7 +18,7 @@ class injectorManager{
     int cylinders;
     unsigned int air_index;
     float air;
-    unsigned int duty_cycle;
+    byte duty_cycle;
     float afr;
     float inj_hrs_mass;
     float fuel_dens_avg;

@@ -9,7 +9,9 @@ class idleManager{
     ~idleManager();
     void update(float rpm);
     unsigned int getThrottle();
+    unsigned int getIacValue();
   private:
+    unsigned int iac_value;
     unsigned int throttle_value;
 };
 

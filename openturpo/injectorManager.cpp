@@ -21,8 +21,9 @@ void injectorManager::update(float rpm){
     air_index = analogRead(amm_sensor);
     air = 10.07*pow(air_index, 1.9544345015);
     duty_cycle = 255*(air/(afr*cylinders*inj_hrs_mass));
+    lambda = analogRead(lambda_sensor);
   }
-  else
+  else if(rpm == 0)
     duty_cycle = 0;
   analogWrite(inj_bank_one, duty_cycle);
   analogWrite(inj_bank_two, duty_cycle);
@@ -33,10 +34,10 @@ float injectorManager::getAir(){
 }
 
 float injectorManager::getAirVoltage(){
- return (5*air_index/1024); 
+ return (float)(5/1024)*air_index; 
 }
 
-unsigned int injectorManager::getDutyCycle(){
+byte injectorManager::getDutyCycle(){
   return duty_cycle;
 }
 

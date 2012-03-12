@@ -9,8 +9,8 @@
 #define inj_bank_one 2
 #define inj_bank_two 4
 #define crk_sensor A15
-#define amm_sensor A0
-#define amm_sensor_temp  A1
+#define amm_sensor A1
+#define amm_sensor_temp  A0
 #define lambda_sensor  A3
 #define engine_temp_sensor A5
 #define knock_sensor_front A7
@@ -32,6 +32,7 @@
 #define cmp_interrupt_deg_before_tdc 90
 #define serial_baud_rate 115200
 #define ign_charge_time 4000
+#define rpm_zero_shutoff_time 500000
 
 enum ENGINE_STATE{
   ENGINE_OFF,
