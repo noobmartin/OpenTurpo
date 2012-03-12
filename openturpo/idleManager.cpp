@@ -9,7 +9,7 @@ idleManager::~idleManager(){
   
 }
 
-void idleManager::update(float rpm){
+void idleManager::update(float rpm, ENGINE_STATE* engine_state){
   throttle_value = analogRead(throttle_sensor);
   digitalWrite(iac_motor, iac_value);
 }

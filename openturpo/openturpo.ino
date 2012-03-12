@@ -12,6 +12,7 @@ static ignitionManager ignition_manager;
 static idleManager idle_manager;
 static relayManager relay_manager;
 static logger logger_instance;
+ENGINE_STATE engine_state;
 
 void setup(){
   pinMode(amm_sensor_temp, INPUT);
@@ -36,30 +37,46 @@ void setup(){
   pinMode(fan_hi_relay, OUTPUT);
   
   Serial.begin(serial_baud_rate);
+  
+  engine_state = ENGINE_OFF;
 }
 
 void loop(){
-  rpm_manager.update();
+  rpm_manager.update(&engine_state);
   float rpm = rpm_manager.getRPM();
   relay_manager.update(rpm);
-  injector_manager.update(rpm);
+  injector_manager.update(rpm, &engine_state);
   ignition_manager.setRPM(rpm);
-  ignition_manager.update();
-  idle_manager.update(rpm);
+  ignition_manager.update(&engine_state);
+  idle_manager.update(rpm, &engine_state);
   
   static unsigned long int last_time_printed = 0;
   
   if (micros() - last_time_printed > 1000000) {
 	  // RPM, dutycycle, airvoltage, lamdavoltage,
 	  Serial.println("*********************************************");
+
+          if(engine_state == ENGINE_OFF)
+            logger_instance.logMessage("Engine off");
+          else if(engine_state == ENGINE_STARTING)
+            logger_instance.logMessage("Engine starting");
+          else if(engine_state == ENGINE_IDLING)
+            logger_instance.logMessage("Engine idling");
+          else if(engine_state == ENGINE_RUNNING)
+            logger_instance.logMessage("Engine running");
+          else
+            logger_instance.logMessage("Engine state unrecognized");
+            
           if(relay_manager.getFuelPumpState())
             logger_instance.logMessage("Fuel pump: ON");
           else
             logger_instance.logMessage("Fuel pump: OFF");
+            
           if(relay_manager.getInjectorsState())
             logger_instance.logMessage("Injectors: ON");
           else
             logger_instance.logMessage("Injectors: OFF");
+            
           logger_instance.logMessage("Idle motor value", idle_manager.getIacValue());
 	  logger_instance.logMessage("RPM", rpm_manager.getRPM());
 	  logger_instance.logMessage("Duty cycle", injector_manager.getDutyCycle());

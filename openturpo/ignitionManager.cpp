@@ -11,9 +11,14 @@ ignitionManager::~ignitionManager(){
   
 }
 
-void ignitionManager::update(){
+void ignitionManager::update(ENGINE_STATE* const engine_state){
   // Linear advance curve from 10 to 40 degrees.
-  ignition_advance = (30/7000)*rpm+10;
+  if(*engine_state == ENGINE_STARTING)
+    ignition_advance = 15;
+  else if(*engine_state == ENGINE_IDLING)
+    ignition_advance = 15;
+  else if(*engine_state == ENGINE_RUNNING)
+    ignition_advance = (30/7000)*rpm+10;
   
   switch (ign_state){
    case IGN_FIND_TRIGGER:

@@ -7,7 +7,7 @@ class ignitionManager{
   public:
     ignitionManager();
     ~ignitionManager();
-    void update();
+    void update(ENGINE_STATE* const engine_state);
     void findTrigger();
     void waitFirstPair();
     void waitSecondPair();

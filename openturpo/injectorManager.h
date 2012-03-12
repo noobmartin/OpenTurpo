@@ -2,12 +2,13 @@
 #define injectorManager_h
 
 #include <Arduino.h>
+#include "common.h"
 
 class injectorManager{
   public:
      injectorManager();
      ~injectorManager();
-     void update(float rpm);
+     void update(float rpm, ENGINE_STATE* const engine_state);
      float getAirVoltage();
      float getAir();
      byte getDutyCycle();

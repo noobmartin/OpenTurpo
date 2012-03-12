@@ -1,5 +1,4 @@
 #include "injectorManager.h"
-#include "common.h"
 
 injectorManager::injectorManager(){
   air_index = 0;
@@ -16,7 +15,7 @@ injectorManager::~injectorManager(){
   
 }
 
-void injectorManager::update(float rpm){
+void injectorManager::update(float rpm, ENGINE_STATE* const engine_state){
   if(rpm){
     air_index = analogRead(amm_sensor);
     air = 10.07*pow(air_index, 1.9544345015);

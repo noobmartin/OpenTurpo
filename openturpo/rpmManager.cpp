@@ -11,7 +11,7 @@ rpmManager::~rpmManager(){
   
 }
 
-void rpmManager::update(){
+void rpmManager::update(ENGINE_STATE* engine_state){
   int crk_value = analogRead(crk_sensor);
   
   if(crk_value >= positive_crank_threshold){
@@ -29,10 +29,13 @@ void rpmManager::update(){
     
     nonzero_captured = 0;
     zero_start_time = now;
+    if(*engine_state == ENGINE_OFF)
+      *engine_state = ENGINE_STARTING;
    }
    else if(zero_start_time != 0){
      if(now - zero_start_time >= rpm_zero_shutoff_time ){
-      rpm = 0; 
+      rpm = 0;
+      *engine_state = ENGINE_OFF;
      }
    }
    else{
