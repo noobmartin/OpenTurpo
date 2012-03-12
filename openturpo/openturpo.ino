@@ -64,6 +64,8 @@ void loop(){
             logger_instance.logMessage("Engine idling");
           else if(engine_state == ENGINE_RUNNING)
             logger_instance.logMessage("Engine running");
+          else if(engine_state == ENGINE_BRAKING)
+            logger_instance.logMessage("Engine braking");
           else
             logger_instance.logMessage("Engine state unrecognized");
             

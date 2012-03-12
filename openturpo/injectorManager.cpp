@@ -33,7 +33,7 @@ float injectorManager::getAir(){
 }
 
 float injectorManager::getAirVoltage(){
- return (float)(5/1024)*air_index; 
+ return (5.0f/1024.0f)*air_index; 
 }
 
 byte injectorManager::getDutyCycle(){
@@ -45,5 +45,5 @@ unsigned int injectorManager::getLambda() {
 }
 
 float injectorManager::getLambdaVoltage() {
-  return (5 * lambda) / 1024;
+  return (5.0f * lambda) / 1024.0f;
 }
