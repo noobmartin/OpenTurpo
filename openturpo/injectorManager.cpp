@@ -16,11 +16,33 @@ injectorManager::~injectorManager(){
 }
 
 void injectorManager::update(float rpm, ENGINE_STATE* const engine_state){
+  static unsigned long last_lambda_correction = 0;
   if(rpm){
-    air_index = analogRead(amm_sensor);
-    air = 10.07*pow(air_index, 1.9544345015);
-    duty_cycle = 255*(air/(afr*cylinders*inj_hrs_mass));
     lambda = analogRead(lambda_sensor);
+    air_index = analogRead(amm_sensor);
+    if(*engine_state == ENGINE_RUNNING){
+      air = 10.07*pow(air_index, 1.9544345015);
+      duty_cycle = 255*(air/(afr*cylinders*inj_hrs_mass));
+    }
+    else if(*engine_state == ENGINE_STARTING){
+      unsigned long now = micros();
+      if(now - last_lambda_correction >= lambda_update_time){
+        last_lambda_correction = now;
+        float lambda_voltage = getLambdaVoltage();
+        if(lambda_voltage > lambda_rich_threshold){
+         duty_cycle -= 1; 
+        }
+        else if(lambda_voltage < lambda_lean_threshold){
+          duty_cycle += 1;
+        }
+      }
+    }
+    else if(*engine_state == ENGINE_RUNNING){
+      
+    }
+    else if(*engine_state == ENGINE_BRAKING){
+      duty_cycle = 0;
+    }
   }
   else if(rpm == 0)
     duty_cycle = 0;

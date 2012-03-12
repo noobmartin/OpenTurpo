@@ -33,6 +33,9 @@
 #define serial_baud_rate 115200
 #define ign_charge_time 4000
 #define rpm_zero_shutoff_time 500000
+#define lambda_rich_threshold 0.7
+#define lambda_lean_threshold 0.2
+#define lambda_update_time 100000
 
 enum ENGINE_STATE{
   ENGINE_OFF,
