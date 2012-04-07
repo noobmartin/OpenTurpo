@@ -6,8 +6,8 @@
 
 #define positive_crank_threshold 5
 #define crank_teeth 58
-#define inj_bank_one 2
-#define inj_bank_two 4
+#define inj_bank_one 11
+#define inj_bank_two 12
 #define crk_sensor A15
 #define amm_sensor A1
 #define amm_sensor_temp  A0
@@ -17,7 +17,7 @@
 #define knock_sensor_rear A9
 #define throttle_sensor A11
 #define cam_sensor A13
-#define iac_motor 10
+#define iac_motor 13
 #define ign_1 33
 #define ign_2 37
 #define ign_3 41
@@ -33,9 +33,10 @@
 #define serial_baud_rate 115200
 #define ign_charge_time 4000
 #define rpm_zero_shutoff_time 500000
-#define lambda_rich_threshold 0.7
-#define lambda_lean_threshold 0.2
-#define lambda_update_time 100000
+#define lambda_rich_threshold 0.8
+#define lambda_lean_threshold 0.35
+#define lambda_update_time 10000
+#define duty_cycle_startup 200
 
 enum ENGINE_STATE{
   ENGINE_OFF,

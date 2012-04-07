@@ -16,6 +16,7 @@ class ignitionManager{
     void fireSecondPair();
     void fireThirdPair();
     void setRPM(float srpm);
+    float getIgnitionAdvance();
   private:
     float ignition_advance;
     float rpm;

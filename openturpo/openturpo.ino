@@ -38,6 +38,15 @@ void setup(){
   
   Serial.begin(serial_baud_rate);
   
+  /**********************************************************************************/
+  // Set pwm resolution  to mode 7 (10 bit) (Credits to jabber @ arduino.cc forums
+  // Timer1A is connected to pins 11 & 12
+  /**********************************************************************************/
+//  TCCR1B &= ~(1 << WGM13);    // Timer B clear bit 4
+//  TCCR1B |=  (1 << WGM12);    // set bit 3
+//  TCCR1A |= (1 << WGM11);    //  Timer A set bit 1
+//  TCCR1A |= (1 << WGM10);    //  set bit 0
+  
   engine_state = ENGINE_OFF;
 }
 
@@ -81,10 +90,13 @@ void loop(){
             
           logger_instance.logMessage("Idle motor value", idle_manager.getIacValue());
 	  logger_instance.logMessage("RPM", rpm_manager.getRPM());
+          logger_instance.logMessage("Ignition advance", ignition_manager.getIgnitionAdvance());
 	  logger_instance.logMessage("Duty cycle", injector_manager.getDutyCycle());
 	  logger_instance.logMessage("Air voltage", injector_manager.getAirVoltage());
+          logger_instance.logMessage("Air (kg/h)", injector_manager.getAir());
 	  logger_instance.logMessage("Lamda voltage", injector_manager.getLambdaVoltage());
 	  Serial.println("*********************************************\n");
 	  last_time_printed = micros();
   }
+  
 }
